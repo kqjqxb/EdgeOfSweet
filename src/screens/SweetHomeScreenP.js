@@ -44,7 +44,7 @@ const mainYellowButtons = [
 
 ]
 
-const MathWithHomeScreen = () => {
+const SweetHomeScreenP = () => {
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
   const [selectedMathWithScreen, setSelectedMathWithScreen] = useState('Home');
   const [mathWithMusicEnabled, setMathWithMusicEnabled] = useState(true);
@@ -122,10 +122,10 @@ const MathWithHomeScreen = () => {
 
   return (
     <View style={{
-      flex: 1,
+      backgroundColor: '#FED9D3',
       width: '100%',
+      flex: 1,
       height: dimensions.height,
-      backgroundColor: '#86CBDD',
     }}>
       {selectedMathWithScreen === 'Home' ? (
         <SafeAreaView style={{
@@ -191,4 +191,4 @@ const MathWithHomeScreen = () => {
   );
 };
 
-export default MathWithHomeScreen;
+export default SweetHomeScreenP;

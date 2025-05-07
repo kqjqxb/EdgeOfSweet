@@ -1,8 +1,8 @@
 import React from 'react';
-import MathWithStack from './StackNavigator';
+import SweetEdgeStack from './StackNavigator';
 
 function App() {
-  return <MathWithStack />;
+  return <SweetEdgeStack />;
 }
 
 export default App;

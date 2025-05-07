@@ -51,7 +51,7 @@ const LoadingMathApp = () => {
   useEffect(() => {
     if (initMathLoadingDone) {
       const timer = setTimeout(() => {
-        const destination = isMathOnboardingWas ? 'MathOnbPage' : 'MathWithHomeScreen';
+        const destination = isMathOnboardingWas ? 'SweetOnboardingSP' : 'SweetHomeScreenP';
         navigation.replace(destination);
       }, 3000);
       return () => clearTimeout(timer);

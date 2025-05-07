@@ -11,7 +11,6 @@ import {
     Modal
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import RNRestart from 'react-native-restart';
 
 const fontRanchersRegular = 'Ranchers-Regular';
 
@@ -37,7 +36,7 @@ const MathSettingsWithScreen = ({ setSelectedMathWithScreen, mathWithMusicEnable
     const clearMathAsyncStorage = async () => {
         try {
             await AsyncStorage.clear();
-            RNRestart.Restart();
+            // RNRestart.Restart();
             console.log('AsyncStorage cleaned');
         } catch (error) {
             console.error('Cleaning AsyncStorage error: ', error);
