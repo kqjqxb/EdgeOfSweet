@@ -7,25 +7,24 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1.0); 
 
   useEffect(() => {
-    const loadMathStoredWithVolume = async () => {
+    const loadSweetVolumeFromeStorage = async () => {
       try {
-        const storedMathWithVolume = await AsyncStorage.getItem('volume');
-        if (storedMathWithVolume !== null) {
-          setVolume(parseFloat(storedMathWithVolume));
+        const weetVolumeFromeStorage = await AsyncStorage.getItem('volume');
+        if (weetVolumeFromeStorage !== null) {
+          setVolume(parseFloat(weetVolumeFromeStorage));
         }
       } catch (error) {
         console.log('Error loading the math volume:', error);
       }
     };
-    loadMathStoredWithVolume();
+    loadSweetVolumeFromeStorage();
   }, []);
 
   const handleChangeThisVolume = async (thisVolume) => {
     try {
       await AsyncStorage.setItem('volume', thisVolume.toString());
-
+      
       setVolume(thisVolume);
-
     } catch (error) {
       console.log('Error saving math volume:', error);
     }

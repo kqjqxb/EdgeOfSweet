@@ -7,17 +7,17 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const loadUserOfMathWith = async () => {
+    const loadingOfSweetUser = async () => {
       try {
-        const storedMathWithUser = await AsyncStorage.getItem('currentUser');
-        if (storedMathWithUser) {
-          setUser(JSON.parse(storedMathWithUser));
+        const sweetUserFromStorage = await AsyncStorage.getItem('currentUser');
+        if (sweetUserFromStorage) {
+          setUser(JSON.parse(sweetUserFromStorage));
         }
       } catch (error) {
-        console.error('Error loading storedMathWithUser user:', error);
+        console.error('Error loading sweet User From Storage:', error);
       }
     };
-    loadUserOfMathWith();
+    loadingOfSweetUser();
   }, []);
 
   return (
