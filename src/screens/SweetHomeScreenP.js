@@ -22,13 +22,13 @@ const fontMontserratRegular = 'Montserrat-Regular';
 const sweetButtons = [
   {
     id: 1,
-    sweetScPage: 'Math Quiz',
+    sweetScPage: 'Settings',
     sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetSettings.png'),
     sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetSettings.png'),
   },
   {
     id: 2,
-    sweetScPage: 'Play Game',
+    sweetScPage: 'Saved',
     sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetHeart.png'),
     sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetHeart.png'),
   },
@@ -40,24 +40,26 @@ const sweetButtons = [
   },
   {
     id: 3,
-    sweetScPage: 'Achievments',
+    sweetScPage: 'My progress',
     sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetCircle.png'),
     sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetCircle.png'),
   },
   {
     id: 4,
-    sweetScPage: 'Settings',
+    sweetScPage: 'My rewards',
     sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetRewards.png'),
     sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetRewards.png'),
   },
-  
+
 ]
 
 const SweetHomeScreenP = () => {
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
-  const [selectedMathWithScreen, setSelectedMathWithScreen] = useState('Home');
-  const [mathWithMusicEnabled, setMathWithMusicEnabled] = useState(true);
-  const [vibroMathEnabled, setVibroMathEnabled] = useState(true);
+  const [choosedSweetScreen, setChoosedSweetScreen] = useState('Home');
+
+  const [isSweetMusicOn, setSweetMusicOn] = useState(true);
+  const [isSweetNotificationsOn, setSweetNotificationsOn] = useState(true);
+  const [isSweetVibrOn, setSweetVibrOn] = useState(true);
 
   const { volume } = useAudio();
   const [mathWithIndOfTrack, setMathWithIndOfTrack] = useState(0);
@@ -79,9 +81,9 @@ const SweetHomeScreenP = () => {
 
   useEffect(() => {
     if (sound) {
-      sound.setVolume(mathWithMusicEnabled ? 1 : 0);
+      sound.setVolume(isSweetMusicOn ? 1 : 0);
     }
-  }, [mathWithMusicEnabled, sound]);
+  }, [isSweetMusicOn, sound]);
 
   const playMathTracksWith = (index) => {
     if (sound) {
@@ -110,16 +112,22 @@ const SweetHomeScreenP = () => {
   useEffect(() => {
     const loadMathSettingsParams = async () => {
       try {
-        const storedMathMusicIs = await AsyncStorage.getItem('mathWithMusicEnabled');
+        const sweetMusicFromStorage = await AsyncStorage.getItem('isSweetMusicOn');
 
-        const storedMathVibrationIs = await AsyncStorage.getItem('chickenVibroEnabled');
+        const sweetVibrationFromStorage = await AsyncStorage.getItem('isSweetVibrationOn');
 
-        if (storedMathMusicIs !== null) {
-          setMathWithMusicEnabled(JSON.parse(storedMathMusicIs));
+        const sweetNotificationsFromStorage = await AsyncStorage.getItem('isSweetNotificationsOn');
+
+        if (sweetMusicFromStorage !== null) {
+          setSweetMusicOn(JSON.parse(sweetMusicFromStorage));
         }
 
-        if (storedMathVibrationIs !== null) {
-          setVibroMathEnabled(JSON.parse(storedMathVibrationIs));
+        if (sweetVibrationFromStorage !== null) {
+          setSweetVibrOn(JSON.parse(sweetVibrationFromStorage));
+        }
+
+        if (sweetNotificationsFromStorage !== null) {
+          setSweetNotificationsOn(JSON.parse(sweetNotificationsFromStorage));
         }
       } catch (error) {
         console.error('Error loading math params:', error);
@@ -136,7 +144,7 @@ const SweetHomeScreenP = () => {
       flex: 1,
       height: dimensions.height,
     }}>
-      {selectedMathWithScreen === 'Home' ? (
+      {choosedSweetScreen === 'Home' ? (
         <SafeAreaView style={{
           flex: 1,
           alignItems: 'center',
@@ -144,16 +152,22 @@ const SweetHomeScreenP = () => {
         }}>
 
         </SafeAreaView>
-      ) : selectedMathWithScreen === 'Settings' ? (
-        <MathSettingsWithScreen setSelectedMathWithScreen={setSelectedMathWithScreen} mathWithMusicEnabled={mathWithMusicEnabled} setMathWithMusicEnabled={setMathWithMusicEnabled}
-          vibroMathEnabled={vibroMathEnabled} setVibroMathEnabled={setVibroMathEnabled}
+      ) : choosedSweetScreen === 'Settings' ? (
+        <MathSettingsWithScreen setChoosedSweetScreen={setChoosedSweetScreen}
+
+          isSweetMusicOn={isSweetMusicOn}
+          setSweetMusicOn={setSweetMusicOn}
+          isSweetNotificationsOn={isSweetNotificationsOn}
+          setSweetNotificationsOn={setSweetNotificationsOn}
+          isSweetVibrOn={isSweetVibrOn}
+          setSweetVibrOn={setSweetVibrOn}
         />
-      ) : selectedMathWithScreen === 'Achievments' ? (
-        <MathAchievmentsScreen setSelectedMathWithScreen={setSelectedMathWithScreen} />
-      ) : selectedMathWithScreen === 'Math Quiz' ? (
-        <MathQuizPage setSelectedMathWithScreen={setSelectedMathWithScreen} />
-      ) : selectedMathWithScreen === 'Play Game' ? (
-        <MathCatchEggsScreen setSelectedMathWithScreen={setSelectedMathWithScreen} vibroMathEnabled={vibroMathEnabled} />
+      ) : choosedSweetScreen === 'Achievments' ? (
+        <MathAchievmentsScreen setChoosedSweetScreen={setChoosedSweetScreen} />
+      ) : choosedSweetScreen === 'Math Quiz' ? (
+        <MathQuizPage setChoosedSweetScreen={setChoosedSweetScreen} />
+      ) : choosedSweetScreen === 'Play Game' ? (
+        <MathCatchEggsScreen setChoosedSweetScreen={setChoosedSweetScreen} isSweetVibrOn={isSweetVibrOn} />
       ) : null}
 
       <View style={{
@@ -175,20 +189,20 @@ const SweetHomeScreenP = () => {
           <TouchableOpacity
             key={index}
             onPress={() => {
-              setSelectedMathWithScreen(sweetBtEdge.sweetScPage);
+              setChoosedSweetScreen(sweetBtEdge.sweetScPage);
             }}
             style={{
-              backgroundColor: selectedMathWithScreen === sweetBtEdge.sweetScPage ? '#582D45' : '#F3CBCE',
+              backgroundColor: choosedSweetScreen === sweetBtEdge.sweetScPage ? '#582D45' : '#F3CBCE',
               width: dimensions.width * 0.15,
               height: dimensions.width * 0.15,
               borderColor: '#DAA1C1',
               alignItems: 'center',
               borderRadius: dimensions.width * 0.031,
-              borderWidth: selectedMathWithScreen !== sweetBtEdge.sweetScPage ? dimensions.width * 0.0025 : 0,
+              borderWidth: choosedSweetScreen !== sweetBtEdge.sweetScPage ? dimensions.width * 0.0025 : 0,
               justifyContent: 'center',
             }}>
             <Image
-              source={selectedMathWithScreen === sweetBtEdge.sweetScPage 
+              source={choosedSweetScreen === sweetBtEdge.sweetScPage
                 ? sweetBtEdge.sweetActiveScPageImg
                 : sweetBtEdge.sweetScPageImg
               }

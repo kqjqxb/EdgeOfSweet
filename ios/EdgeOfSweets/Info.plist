@@ -32,15 +32,17 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Montserrat-Black.ttf</string>
 		<string>Montserrat-Bold.ttf</string>
 		<string>Montserrat-Light.ttf</string>
 		<string>Montserrat-Regular.ttf</string>
-		<string>RammettoOne-Regular.ttf</string>
-		<string>Ranchers-Regular.ttf</string>
+		<string>Nunito-Black.ttf</string>
+		<string>Nunito-Bold.ttf</string>
+		<string>Nunito-Light.ttf</string>
+		<string>Nunito-Regular.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

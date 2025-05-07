@@ -10,14 +10,16 @@
 		0C80B921A6F3F58F76C31292 /* libPods-EdgeOfSweets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-EdgeOfSweets.a */; };
 		0FED970FAF564CDC862BABAD /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E3389B4030284CAB99EA30C5 /* Montserrat-Light.ttf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		35FEBB82BAD348DFA93470DC /* Nunito-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E404624BA67C42779206A405 /* Nunito-Bold.ttf */; };
+		4053DA36CF84454AA8078435 /* Nunito-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 77B19FFB3CB946119125F6E8 /* Nunito-Light.ttf */; };
 		62BF68631B4F4ED0BF46B380 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3BD9D89AE2AF4F6EA2B78426 /* Montserrat-Bold.ttf */; };
-		64A4580E29164726B74596AF /* RammettoOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A66BA7D990E64545BCE9457F /* RammettoOne-Regular.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A1D2B21FAD1793CA85CB1078 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		B85A941F948D4A6E96F15A23 /* Montserrat-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5B6F0E94DFE747E9A7C73568 /* Montserrat-Black.ttf */; };
+		C0E6EFF149B34C3F91B571DC /* Nunito-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E442FF4568BE4A82B1BC9D94 /* Nunito-Regular.ttf */; };
+		CD7942ECC79F4BBBBCE0F3F9 /* Nunito-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C83B28ECA81E448A81E9EA22 /* Nunito-Black.ttf */; };
 		DBC6C669B0C2474DBA9EF906 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C4081DCC102446C8A45AD97B /* Montserrat-Regular.ttf */; };
-		E1393F41669044549DBBE85D /* Ranchers-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 492CAB83658E4176AB9D85A1 /* Ranchers-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,15 +29,17 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = EdgeOfSweets/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-EdgeOfSweets.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EdgeOfSweets.debug.xcconfig"; path = "Target Support Files/Pods-EdgeOfSweets/Pods-EdgeOfSweets.debug.xcconfig"; sourceTree = "<group>"; };
 		3BD9D89AE2AF4F6EA2B78426 /* Montserrat-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Bold.ttf"; path = "../src/assets/fonts/Montserrat-Bold.ttf"; sourceTree = "<group>"; };
-		492CAB83658E4176AB9D85A1 /* Ranchers-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Ranchers-Regular.ttf"; path = "../src/assets/fonts/Ranchers-Regular.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-EdgeOfSweets.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EdgeOfSweets.release.xcconfig"; path = "Target Support Files/Pods-EdgeOfSweets/Pods-EdgeOfSweets.release.xcconfig"; sourceTree = "<group>"; };
 		5B6F0E94DFE747E9A7C73568 /* Montserrat-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Black.ttf"; path = "../src/assets/fonts/Montserrat-Black.ttf"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-EdgeOfSweets.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EdgeOfSweets.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = EdgeOfSweets/AppDelegate.swift; sourceTree = "<group>"; };
+		77B19FFB3CB946119125F6E8 /* Nunito-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Nunito-Light.ttf"; path = "../src/assets/fonts/Nunito-Light.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = EdgeOfSweets/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		A66BA7D990E64545BCE9457F /* RammettoOne-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "RammettoOne-Regular.ttf"; path = "../src/assets/fonts/RammettoOne-Regular.ttf"; sourceTree = "<group>"; };
 		C4081DCC102446C8A45AD97B /* Montserrat-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Regular.ttf"; path = "../src/assets/fonts/Montserrat-Regular.ttf"; sourceTree = "<group>"; };
+		C83B28ECA81E448A81E9EA22 /* Nunito-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Nunito-Black.ttf"; path = "../src/assets/fonts/Nunito-Black.ttf"; sourceTree = "<group>"; };
 		E3389B4030284CAB99EA30C5 /* Montserrat-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Light.ttf"; path = "../src/assets/fonts/Montserrat-Light.ttf"; sourceTree = "<group>"; };
+		E404624BA67C42779206A405 /* Nunito-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Nunito-Bold.ttf"; path = "../src/assets/fonts/Nunito-Bold.ttf"; sourceTree = "<group>"; };
+		E442FF4568BE4A82B1BC9D94 /* Nunito-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Nunito-Regular.ttf"; path = "../src/assets/fonts/Nunito-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -79,8 +83,10 @@
 				3BD9D89AE2AF4F6EA2B78426 /* Montserrat-Bold.ttf */,
 				E3389B4030284CAB99EA30C5 /* Montserrat-Light.ttf */,
 				C4081DCC102446C8A45AD97B /* Montserrat-Regular.ttf */,
-				A66BA7D990E64545BCE9457F /* RammettoOne-Regular.ttf */,
-				492CAB83658E4176AB9D85A1 /* Ranchers-Regular.ttf */,
+				C83B28ECA81E448A81E9EA22 /* Nunito-Black.ttf */,
+				E404624BA67C42779206A405 /* Nunito-Bold.ttf */,
+				77B19FFB3CB946119125F6E8 /* Nunito-Light.ttf */,
+				E442FF4568BE4A82B1BC9D94 /* Nunito-Regular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -191,8 +197,10 @@
 				62BF68631B4F4ED0BF46B380 /* Montserrat-Bold.ttf in Resources */,
 				0FED970FAF564CDC862BABAD /* Montserrat-Light.ttf in Resources */,
 				DBC6C669B0C2474DBA9EF906 /* Montserrat-Regular.ttf in Resources */,
-				64A4580E29164726B74596AF /* RammettoOne-Regular.ttf in Resources */,
-				E1393F41669044549DBBE85D /* Ranchers-Regular.ttf in Resources */,
+				CD7942ECC79F4BBBBCE0F3F9 /* Nunito-Black.ttf in Resources */,
+				35FEBB82BAD348DFA93470DC /* Nunito-Bold.ttf in Resources */,
+				4053DA36CF84454AA8078435 /* Nunito-Light.ttf in Resources */,
+				C0E6EFF149B34C3F91B571DC /* Nunito-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -60,7 +60,7 @@ const colorEggs = [
 
 const fontRanchersRegular = 'Ranchers-Regular';
 
-const MathAchievmentsScreen = ({ setSelectedMathWithScreen }) => {
+const MathAchievmentsScreen = ({ setChoosedSweetScreen }) => {
     const [dimensions, setDimensions] = useState(Dimensions.get('window'));
     const styles = mathSettingsStyles(dimensions);
     const [ownedMathQuizLevels, setOwnedMathQuizLevels] = useState([1]);
@@ -146,7 +146,7 @@ const MathAchievmentsScreen = ({ setSelectedMathWithScreen }) => {
 
                 <TouchableOpacity
                     onPress={() => {
-                        setSelectedMathWithScreen('Home');
+                        setChoosedSweetScreen('Home');
                     }}
                     style={{
                         position: 'absolute',

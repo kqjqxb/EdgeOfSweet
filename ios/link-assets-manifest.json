@@ -18,12 +18,20 @@
       "sha1": "1c8119b38eef1914a4fbd9f6cfdedf198445ab97"
     },
     {
-      "path": "src/assets/fonts/RammettoOne-Regular.ttf",
-      "sha1": "3905e48d475422d8fc82200795ddcdbecef633ad"
+      "path": "src/assets/fonts/Nunito-Black.ttf",
+      "sha1": "01abc1142e597b9a7748eb2d14ff823d65a54f01"
     },
     {
-      "path": "src/assets/fonts/Ranchers-Regular.ttf",
-      "sha1": "f7b224efa8d7795cf9c2fb7b71e7c6e204ed983b"
+      "path": "src/assets/fonts/Nunito-Bold.ttf",
+      "sha1": "d8091536d0fab37a3239067f708a0221070835da"
+    },
+    {
+      "path": "src/assets/fonts/Nunito-Light.ttf",
+      "sha1": "c570f483013f57db1a325ae1ddc2e11c115bb441"
+    },
+    {
+      "path": "src/assets/fonts/Nunito-Regular.ttf",
+      "sha1": "465c464793593babb53e51e2a56562cdd79c237d"
     }
   ]
 }

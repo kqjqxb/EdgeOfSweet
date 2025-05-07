@@ -64,7 +64,7 @@ const roadMathEggLevels = [
 ]
 
 
-const MathQuizPage = ({ setSelectedMathWithScreen, }) => {
+const MathQuizPage = ({ setChoosedSweetScreen, }) => {
     const [dimensions, setDimensions] = useState(Dimensions.get('window'));
     const styles = createMathQuizStyles(dimensions);
 
@@ -194,7 +194,7 @@ const MathQuizPage = ({ setSelectedMathWithScreen, }) => {
 
                     <TouchableOpacity
                         onPress={() => {
-                            setSelectedMathWithScreen('Home');
+                            setChoosedSweetScreen('Home');
                         }}
                         style={{
                             backgroundColor: '#FFE066',

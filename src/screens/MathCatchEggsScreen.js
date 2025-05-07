@@ -64,7 +64,7 @@ const colorEggs = [
 
 const fontRanchersRegular = 'Ranchers-Regular';
 
-const MathCatchEggsScreen = ({ setSelectedMathWithScreen, vibroMathEnabled }) => {
+const MathCatchEggsScreen = ({ setChoosedSweetScreen, vibroMathEnabled }) => {
   const [dimensions] = useState(Dimensions.get('window'));
 
   const [eggFallingObjects, setEggFallingObjects] = useState([]);
@@ -308,7 +308,7 @@ const MathCatchEggsScreen = ({ setSelectedMathWithScreen, vibroMathEnabled }) =>
 
           <TouchableOpacity
             onPress={() => {
-              setSelectedMathWithScreen('Home');
+              setChoosedSweetScreen('Home');
             }}
             style={{
               backgroundColor: '#FFE066',
@@ -423,7 +423,7 @@ const MathCatchEggsScreen = ({ setSelectedMathWithScreen, vibroMathEnabled }) =>
 
             <TouchableOpacity
               onPress={() => {
-                setSelectedMathWithScreen('Home');
+                setChoosedSweetScreen('Home');
               }}
               style={[styles.modalBottomButtons, {
                 bottom: dimensions.height * 0.01,
