@@ -5,7 +5,6 @@ import {
   Image,
   Dimensions,
   SafeAreaView,
-  Text,
   Platform,
 } from 'react-native';
 
@@ -18,30 +17,40 @@ import { useAudio } from '../context/AudioContext';
 import MathCatchEggsScreen from './MathCatchEggsScreen';
 import MathAchievmentsScreen from './MathAchievmentsScreen';
 
-const fontRanchersRegular = 'Ranchers-Regular';
+const fontMontserratRegular = 'Montserrat-Regular';
 
-const mainYellowButtons = [
+const sweetButtons = [
   {
     id: 1,
-    text: 'Math Quiz',
-    image: require('../assets/images/mathQuizButton.png'),
+    sweetScPage: 'Math Quiz',
+    sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetSettings.png'),
+    sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetSettings.png'),
   },
   {
     id: 2,
-    text: 'Play Game',
-    image: require('../assets/images/mathPlayButton.png'),
+    sweetScPage: 'Play Game',
+    sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetHeart.png'),
+    sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetHeart.png'),
+  },
+  {
+    id: 5,
+    sweetScPage: 'Home',
+    sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetHome.png'),
+    sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetHome.png'),
   },
   {
     id: 3,
-    text: 'Achievments',
-    image: require('../assets/images/mathAchievmentsButton.png'),
+    sweetScPage: 'Achievments',
+    sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetCircle.png'),
+    sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetCircle.png'),
   },
   {
     id: 4,
-    text: 'Settings',
-    image: require('../assets/images/mathSettingsButton.png'),
+    sweetScPage: 'Settings',
+    sweetScPageImg: require('../assets/icons/sweetButtonsIcons/nonActiveSweetButton/sweetRewards.png'),
+    sweetActiveScPageImg: require('../assets/icons/sweetButtonsIcons/activeSweetButton/sweetRewards.png'),
   },
-
+  
 ]
 
 const SweetHomeScreenP = () => {
@@ -133,47 +142,6 @@ const SweetHomeScreenP = () => {
           alignItems: 'center',
           marginTop: Platform.OS === 'android' ? dimensions.height * 0.03 : 0,
         }}>
-          {mainYellowButtons.map((mathButton, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                setSelectedMathWithScreen(mathButton.text);
-              }}
-              style={{
-                backgroundColor: '#FFE066',
-                alignSelf: 'center',
-                width: dimensions.width * 0.96,
-                borderColor: 'black',
-                alignItems: 'center',
-                height: dimensions.height * 0.17,
-                borderRadius: dimensions.width * 0.0282828,
-                flexDirection: 'row',
-                borderWidth: dimensions.width * 0.003,
-                marginBottom: dimensions.height * 0.03,
-                justifyContent: 'flex-start',
-              }}>
-              <Image
-                source={mathButton.image}
-                style={{
-                  width: dimensions.height * 0.14,
-                  height: dimensions.height * 0.14,
-                  marginRight: dimensions.width * 0.05,
-                }}
-                resizeMode="contain"
-              />
-              <Text
-                style={{
-                  color: '#5C4033',
-                  textAlign: 'left',
-                  fontSize: dimensions.width * 0.1,
-                  fontWeight: 700,
-                  alignSelf: 'center',
-                  fontFamily: fontRanchersRegular,
-                }}>
-                {mathButton.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
 
         </SafeAreaView>
       ) : selectedMathWithScreen === 'Settings' ? (
@@ -185,8 +153,55 @@ const SweetHomeScreenP = () => {
       ) : selectedMathWithScreen === 'Math Quiz' ? (
         <MathQuizPage setSelectedMathWithScreen={setSelectedMathWithScreen} />
       ) : selectedMathWithScreen === 'Play Game' ? (
-        <MathCatchEggsScreen setSelectedMathWithScreen={setSelectedMathWithScreen} vibroMathEnabled={vibroMathEnabled}/>
+        <MathCatchEggsScreen setSelectedMathWithScreen={setSelectedMathWithScreen} vibroMathEnabled={vibroMathEnabled} />
       ) : null}
+
+      <View style={{
+        position: 'absolute',
+        bottom: '5%',
+        height: dimensions.width * 0.18,
+        width: '90%',
+        borderRadius: dimensions.width * 0.035,
+        backgroundColor: '#F3CBCE',
+        borderWidth: dimensions.width * 0.002,
+        borderColor: '#582D45',
+        alignSelf: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: dimensions.width * 0.03,
+      }}>
+        {sweetButtons.map((sweetBtEdge, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              setSelectedMathWithScreen(sweetBtEdge.sweetScPage);
+            }}
+            style={{
+              backgroundColor: selectedMathWithScreen === sweetBtEdge.sweetScPage ? '#582D45' : '#F3CBCE',
+              width: dimensions.width * 0.15,
+              height: dimensions.width * 0.15,
+              borderColor: '#DAA1C1',
+              alignItems: 'center',
+              borderRadius: dimensions.width * 0.031,
+              borderWidth: selectedMathWithScreen !== sweetBtEdge.sweetScPage ? dimensions.width * 0.0025 : 0,
+              justifyContent: 'center',
+            }}>
+            <Image
+              source={selectedMathWithScreen === sweetBtEdge.sweetScPage 
+                ? sweetBtEdge.sweetActiveScPageImg
+                : sweetBtEdge.sweetScPageImg
+              }
+              style={{
+                width: dimensions.height * 0.04,
+                height: dimensions.height * 0.04,
+              }}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        ))}
+
+      </View>
     </View>
   );
 };
