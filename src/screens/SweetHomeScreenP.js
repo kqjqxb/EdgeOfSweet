@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 
-import MathSettingsWithScreen from './MathSettingsWithScreen';
+import SweetSettingsScreen from './SweetSettingsScreen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MathQuizPage from './MathQuizPage';
@@ -16,6 +16,7 @@ import Sound from 'react-native-sound';
 import { useAudio } from '../context/AudioContext';
 import MathCatchEggsScreen from './MathCatchEggsScreen';
 import MathAchievmentsScreen from './MathAchievmentsScreen';
+import SweetProgressScreen from './SweetProgressScreen';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
@@ -153,7 +154,7 @@ const SweetHomeScreenP = () => {
 
         </SafeAreaView>
       ) : choosedSweetScreen === 'Settings' ? (
-        <MathSettingsWithScreen setChoosedSweetScreen={setChoosedSweetScreen}
+        <SweetSettingsScreen setChoosedSweetScreen={setChoosedSweetScreen}
 
           isSweetMusicOn={isSweetMusicOn}
           setSweetMusicOn={setSweetMusicOn}
@@ -162,8 +163,8 @@ const SweetHomeScreenP = () => {
           isSweetVibrOn={isSweetVibrOn}
           setSweetVibrOn={setSweetVibrOn}
         />
-      ) : choosedSweetScreen === 'Achievments' ? (
-        <MathAchievmentsScreen setChoosedSweetScreen={setChoosedSweetScreen} />
+      ) : choosedSweetScreen === 'My progress' ? (
+        <SweetProgressScreen setChoosedSweetScreen={setChoosedSweetScreen} />
       ) : choosedSweetScreen === 'Math Quiz' ? (
         <MathQuizPage setChoosedSweetScreen={setChoosedSweetScreen} />
       ) : choosedSweetScreen === 'Play Game' ? (

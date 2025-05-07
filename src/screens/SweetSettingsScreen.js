@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const fontMontserratRegular = 'Montserrat-Regular';
 const fontNunitoRegular = 'Nunito-Regular';
 
-const MathSettingsWithScreen = ({
+const SweetSettingsScreen = ({
     setChoosedSweetScreen,
     isSweetMusicOn,
     setSweetMusicOn,
@@ -140,4 +140,4 @@ const mathSettingsStyles = (dimensions) => StyleSheet.create({
     }
 });
 
-export default MathSettingsWithScreen;
+export default SweetSettingsScreen;
