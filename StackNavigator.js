@@ -7,7 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { UserProvider, UserContext } from './src/context/UserContext';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
-import LoadingMathApp from './src/screens/LoadingMathApp';
+import SweetAppLoading from './src/screens/SweetAppLoading';
 import EdgeOnboardingOfSweetScreen from './src/screens/EdgeOnboardingOfSweetScreen';
 import { AudioProvider } from './src/context/AudioContext';
 
@@ -31,9 +31,9 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <AudioProvider>
-        <Stack.Navigator initialRouteName={'SweetOnboardingSP'}>
+        <Stack.Navigator initialRouteName={'SweetLoading'}>
           <Stack.Screen name="SweetOnboardingSP" component={EdgeOnboardingOfSweetScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="SweetLoading" component={LoadingMathApp} options={{ headerShown: false }} />
+          <Stack.Screen name="SweetLoading" component={SweetAppLoading} options={{ headerShown: false }} />
           <Stack.Screen name="SweetHomeScreenP" component={SweetHomeScreenP} options={{ headerShown: false }} />
         </Stack.Navigator>
       </AudioProvider>
