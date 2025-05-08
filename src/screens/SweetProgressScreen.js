@@ -166,7 +166,7 @@ const SweetProgressScreen = ({
             }}>
                 <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.045, textAlign: 'center', alignSelf: 'center', fontWeight: '400' }]}>
                     Share my progress
-                </Text>
+                </Text> 
             </TouchableOpacity>
         </SafeAreaView>
     );
