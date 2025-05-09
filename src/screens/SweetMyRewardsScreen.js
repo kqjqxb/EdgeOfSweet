@@ -13,17 +13,17 @@ import { Image } from 'react-native-animatable';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
-const SweetSavedScreen = ({ }) => {
+const SweetMyRewardsScreen = ({ }) => {
     const dimensions = Dimensions.get('window');
     const styles = mathSettingsStyles(dimensions);
 
-    const [sweetSavedElements, setSweetSavedElements] = useState([]);
+    const [sweetSavedElements, setSweetSavedElements] = useState([1]);
 
     return (
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
             <View style={styles.header}>
                 <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500' }]}>
-                    Saved:
+                    My rewards:
                 </Text>
             </View>
             {sweetSavedElements.length === 0 ? (
@@ -32,7 +32,7 @@ const SweetSavedScreen = ({ }) => {
                     marginTop: dimensions.height * 0.05,
                     color: '#582D45'
                 }]}>
-                    There are no saved tasks yet
+                    There are no rewards yet
                 </Text>
             ) : (
                 <ScrollView style={{
@@ -62,7 +62,7 @@ const SweetSavedScreen = ({ }) => {
                                 width: '100%',
                             }}>
                                 <Image
-                                    source={require('../assets/icons/timeIcon.png')}
+                                    source={require('../assets/icons/rewardIcon.png')}
                                     style={{
                                         width: dimensions.width * 0.06,
                                         height: dimensions.width * 0.06,
@@ -74,7 +74,7 @@ const SweetSavedScreen = ({ }) => {
                                     fontSize: dimensions.width * 0.04, textAlign: 'left', fontWeight: '400',
                                     color: '#B27396'
                                 }]}>
-                                    12.04.2025
+                                    Reward for 12.04.2025
                                 </Text>
                             </View>
 
@@ -86,51 +86,26 @@ const SweetSavedScreen = ({ }) => {
                                 Look through old photos and remember a good moment.
                             </Text>
 
-                            <View style={{
-                                marginTop: dimensions.height * 0.01,
-                                flexDirection: 'row',
+                            <TouchableOpacity style={{
+                                width: dimensions.width * 0.12,
+                                height: dimensions.width * 0.12,
                                 alignItems: 'center',
-                                justifyContent: 'flex-start',
-                                width: '100%',
+                                justifyContent: 'center',
+                                borderRadius: dimensions.width * 0.03,
+                                borderWidth: dimensions.width * 0.003,
+                                borderColor: '#582D45',
+                                marginTop: dimensions.height * 0.01,
+                                alignSelf: 'flex-start',
                             }}>
-                                <TouchableOpacity style={{
-                                    width: dimensions.width * 0.12,
-                                    height: dimensions.width * 0.12,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: dimensions.width * 0.03,
-                                    borderWidth: dimensions.width * 0.003,
-                                    borderColor: '#582D45',
-                                }}>
-                                    <Image
-                                        source={require('../assets/icons/shareSweetIcon.png')}
-                                        style={{
-                                            width: dimensions.width * 0.06,
-                                            height: dimensions.width * 0.06,
-                                        }}
-                                        resizeMode="contain"
-                                    />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={{
-                                    width: dimensions.width * 0.12,
-                                    height: dimensions.width * 0.12,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: dimensions.width * 0.03,
-                                    backgroundColor: '#582D45',
-                                    marginLeft: dimensions.width * 0.025,
-                                }}>
-                                    <Image
-                                        source={require('../assets/icons/fullSweetHeartIcon.png')}
-                                        style={{
-                                            width: dimensions.width * 0.07,
-                                            height: dimensions.width * 0.07,
-                                        }}
-                                        resizeMode="contain"
-                                    />
-                                </TouchableOpacity>
-                            </View>
+                                <Image
+                                    source={require('../assets/icons/shareSweetIcon.png')}
+                                    style={{
+                                        width: dimensions.width * 0.06,
+                                        height: dimensions.width * 0.06,
+                                    }}
+                                    resizeMode="contain"
+                                />
+                            </TouchableOpacity>
                         </View>
                     ))}
                 </ScrollView>
@@ -158,4 +133,4 @@ const mathSettingsStyles = (dimensions) => StyleSheet.create({
     },
 });
 
-export default SweetSavedScreen;
+export default SweetMyRewardsScreen;

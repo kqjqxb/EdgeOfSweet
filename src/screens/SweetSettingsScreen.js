@@ -54,7 +54,7 @@ const SweetSettingsScreen = ({
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
             <View style={styles.header}>
                 <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500' }]}>
-                    Settings
+                    Settings:
                 </Text>
             </View>
 

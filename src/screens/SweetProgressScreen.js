@@ -42,15 +42,7 @@ const levels = [
     },
 ]
 
-const SweetProgressScreen = ({
-    setChoosedSweetScreen,
-    isSweetMusicOn,
-    setSweetMusicOn,
-    isSweetNotificationsOn,
-    setSweetNotificationsOn,
-    isSweetVibrOn,
-    setSweetVibrOn
-}) => {
+const SweetProgressScreen = ({}) => {
     const dimensions = Dimensions.get('window');
     const styles = mathSettingsStyles(dimensions);
 
@@ -58,7 +50,7 @@ const SweetProgressScreen = ({
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
             <View style={styles.header}>
                 <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500' }]}>
-                    My progress
+                    My progress:
                 </Text>
             </View>
 

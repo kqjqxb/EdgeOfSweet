@@ -18,6 +18,7 @@ import MathCatchEggsScreen from './MathCatchEggsScreen';
 import MathAchievmentsScreen from './MathAchievmentsScreen';
 import SweetProgressScreen from './SweetProgressScreen';
 import SweetSavedScreen from './SweetSavedScreen';
+import SweetMyRewardsScreen from './SweetMyRewardsScreen';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
@@ -168,8 +169,8 @@ const SweetHomeScreenP = () => {
         <SweetProgressScreen setChoosedSweetScreen={setChoosedSweetScreen} />
       ) : choosedSweetScreen === 'Saved' ? (
         <SweetSavedScreen setChoosedSweetScreen={setChoosedSweetScreen} />
-      ) : choosedSweetScreen === 'Play Game' ? (
-        <MathCatchEggsScreen setChoosedSweetScreen={setChoosedSweetScreen} isSweetVibrOn={isSweetVibrOn} />
+      ) : choosedSweetScreen === 'My rewards' ? (
+        <SweetMyRewardsScreen setChoosedSweetScreen={setChoosedSweetScreen} />
       ) : null}
 
       <View style={{
