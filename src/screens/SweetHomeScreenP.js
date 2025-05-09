@@ -17,6 +17,7 @@ import { useAudio } from '../context/AudioContext';
 import MathCatchEggsScreen from './MathCatchEggsScreen';
 import MathAchievmentsScreen from './MathAchievmentsScreen';
 import SweetProgressScreen from './SweetProgressScreen';
+import SweetSavedScreen from './SweetSavedScreen';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
@@ -165,8 +166,8 @@ const SweetHomeScreenP = () => {
         />
       ) : choosedSweetScreen === 'My progress' ? (
         <SweetProgressScreen setChoosedSweetScreen={setChoosedSweetScreen} />
-      ) : choosedSweetScreen === 'Math Quiz' ? (
-        <MathQuizPage setChoosedSweetScreen={setChoosedSweetScreen} />
+      ) : choosedSweetScreen === 'Saved' ? (
+        <SweetSavedScreen setChoosedSweetScreen={setChoosedSweetScreen} />
       ) : choosedSweetScreen === 'Play Game' ? (
         <MathCatchEggsScreen setChoosedSweetScreen={setChoosedSweetScreen} isSweetVibrOn={isSweetVibrOn} />
       ) : null}

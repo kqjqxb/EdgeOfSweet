@@ -54,32 +54,6 @@ const SweetProgressScreen = ({
     const dimensions = Dimensions.get('window');
     const styles = mathSettingsStyles(dimensions);
 
-    const sweetSaveSettings = async (key, value) => {
-        try {
-            await AsyncStorage.setItem(key, JSON.stringify(value));
-        } catch (error) {
-            console.error("Error saving settings:", error);
-        }
-    };
-
-    const toggleSweetSwitchOfSounds = () => {
-        const newSweetSounsValue = !isSweetMusicOn;
-        setSweetMusicOn(newSweetSounsValue);
-        sweetSaveSettings('isSweetMusicOn', newSweetSounsValue);
-    };
-
-    const toggleSweetSwitchOfNotification = () => {
-        const newSweetNotificationValue = !isSweetNotificationsOn;
-        setSweetNotificationsOn(newSweetNotificationValue);
-        sweetSaveSettings('isSweetNotificationsOn', newSweetNotificationValue);
-    };
-
-    const toggleSweetVibrationSwitch = () => {
-        const newSweetVibrationValue = !isSweetVibrOn;
-        setSweetVibrOn(newSweetVibrationValue);
-        sweetSaveSettings('isSweetVibrationOn', newSweetVibrationValue);
-    };
-
     return (
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
             <View style={styles.header}>
@@ -189,29 +163,6 @@ const mathSettingsStyles = (dimensions) => StyleSheet.create({
         alignSelf: 'center',
         fontFamily: fontMontserratRegular,
     },
-    settingsContainer: {
-        width: '90%',
-        paddingVertical: dimensions.height * 0.01,
-        paddingHorizontal: dimensions.width * 0.05,
-        alignSelf: 'center',
-        backgroundColor: 'white',
-        marginTop: dimensions.height * 0.02,
-        borderRadius: dimensions.width * 0.03,
-    },
-    switchView: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 10,
-        borderBottomColor: 'rgba(84, 84, 86, 0.34)',
-        borderBottomWidth: 0.5,
-        borderRadius: 8,
-    },
-    switchTexts: {
-        color: 'black',
-        fontSize: dimensions.width * 0.05,
-        fontFamily: fontNunitoRegular,
-    }
 });
 
 export default SweetProgressScreen;
