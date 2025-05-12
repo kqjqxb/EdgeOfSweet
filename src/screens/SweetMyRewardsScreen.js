@@ -6,18 +6,24 @@ import {
     SafeAreaView,
     StyleSheet,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    Share
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native-animatable';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
-const SweetMyRewardsScreen = ({ }) => {
+const formatSweetDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+    const month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+};
+
+const SweetMyRewardsScreen = ({ userRewards }) => {
     const dimensions = Dimensions.get('window');
     const styles = mathSettingsStyles(dimensions);
-
-    const [sweetSavedElements, setSweetSavedElements] = useState([1]);
 
     return (
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
@@ -26,7 +32,7 @@ const SweetMyRewardsScreen = ({ }) => {
                     My rewards:
                 </Text>
             </View>
-            {sweetSavedElements.length === 0 ? (
+            {userRewards.length === 0 ? (
                 <Text style={[styles.montserratText, {
                     fontSize: dimensions.width * 0.04, textAlign: 'center', alignSelf: 'center', fontWeight: '500',
                     marginTop: dimensions.height * 0.05,
@@ -43,7 +49,7 @@ const SweetMyRewardsScreen = ({ }) => {
                         paddingBottom: dimensions.height * 0.14,
                     }}
                 >
-                    {sweetSavedElements.map((sweetSavedEl, index) => (
+                    {userRewards.map((sweetSavedEl, index) => (
                         <View key={index} style={{
                             width: '90%',
                             alignSelf: 'center',
@@ -74,7 +80,7 @@ const SweetMyRewardsScreen = ({ }) => {
                                     fontSize: dimensions.width * 0.04, textAlign: 'left', fontWeight: '400',
                                     color: '#B27396'
                                 }]}>
-                                    Reward for 12.04.2025
+                                    Reward for {formatSweetDate(sweetSavedEl.receivedDate)}
                                 </Text>
                             </View>
 
@@ -83,7 +89,7 @@ const SweetMyRewardsScreen = ({ }) => {
                                 marginTop: dimensions.height * 0.01,
                                 color: '#582D45'
                             }]}>
-                                Look through old photos and remember a good moment.
+                                {sweetSavedEl.sweetReward}
                             </Text>
 
                             <TouchableOpacity style={{
@@ -96,7 +102,13 @@ const SweetMyRewardsScreen = ({ }) => {
                                 borderColor: '#582D45',
                                 marginTop: dimensions.height * 0.01,
                                 alignSelf: 'flex-start',
-                            }}>
+                            }}
+                                onPress={() => {
+                                    Share.share({
+                                        message: `I received a reward '${sweetSavedEl.sweetReward}' on ${formatSweetDate(sweetSavedEl.receivedDate)}`,
+                                    });
+                                }}
+                            >
                                 <Image
                                     source={require('../assets/icons/shareSweetIcon.png')}
                                     style={{

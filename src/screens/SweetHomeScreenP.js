@@ -9,6 +9,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Share,
 } from 'react-native';
 import { ChevronDownIcon, ChevronUpIcon } from 'react-native-heroicons/solid';
 import SweetSettingsScreen from './SweetSettingsScreen';
@@ -21,6 +22,7 @@ import SweetSavedScreen from './SweetSavedScreen';
 import SweetMyRewardsScreen from './SweetMyRewardsScreen';
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import sweetTasksData from '../components/sweetTasksData';
+import sweetRewards from '../components/sweetRewards';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
@@ -96,13 +98,53 @@ const SweetHomeScreenP = () => {
   const [isTasksGiven, setIsTasksGiven] = useState(false);
   const [isTasksVisible, setIsTasksVisible] = useState(false);
   const [isTaskOpened, setIsTaskOpened] = useState(false);
+  const [userRewards, setUserRewards] = useState([]);
+  const [notAvailableRewards, setNotAvailableRewards] = useState([]);
+  const [currentReward, setCurrentReward] = useState(null);
+  const [levelPoints, setLevelPoints] = useState(0);
 
   const [sweetTasks, setSweetTasks] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState('00:00:00');
 
   useEffect(() => {
     console.log('sweetTasks', sweetTasks);
   }, [sweetTasks]);
+
+  useEffect(() => {
+    const loadUserRewards = async () => {
+      try {
+        const storedUserRewards = await AsyncStorage.getItem('userRewards');
+
+        if (storedUserRewards !== null) {
+          setUserRewards(JSON.parse(storedUserRewards));
+        } else {
+          await AsyncStorage.setItem('userRewards', JSON.stringify([]));
+          setUserRewards([]);
+        }
+
+        const storedAwailableRewards = await AsyncStorage.getItem('notAvailableRewards');
+
+        if (storedAwailableRewards !== null) {
+          setNotAvailableRewards(JSON.parse(storedAwailableRewards));
+        } else {
+          await AsyncStorage.setItem('notAvailableRewards', JSON.stringify([]));
+          setNotAvailableRewards([]);
+        }
+
+        const storedCurrentReward = await AsyncStorage.getItem('currentReward');
+        if (storedCurrentReward !== null) {
+          setCurrentReward(JSON.parse(storedCurrentReward));
+        }
+
+        const storedLevelPoints = await AsyncStorage.getItem('levelPoints');
+        if (storedLevelPoints !== null) {
+          setLevelPoints(JSON.parse(storedLevelPoints));
+        }
+      } catch (error) {
+        console.error('Error loading userRewards:', error);
+      }
+    };
+    loadUserRewards();
+  }, []);
 
   useEffect(() => {
     const loadCurrentChallenge = async () => {
@@ -122,86 +164,104 @@ const SweetHomeScreenP = () => {
 
 
   const handleAcceptChallenge = async (index) => {
-    if (isVibrationEnabled) {
+    if (typeof isSweetVibrOn !== 'undefined' && isSweetVibrOn) {
       ReactNativeHapticFeedback.trigger("impactLight", {
         enableVibrateFallback: true,
         ignoreAndroidSystemSettings: false,
       });
     }
-    
+
     const updatedChallenges = [...sweetTasks.tasks];
-  
-    // Якщо статус уже 'in progress', тоді ставимо 'done'
+
     if (updatedChallenges[index].status === 'in progress') {
       updatedChallenges[index].status = 'done';
       updatedChallenges[index].endTime = new Date().toISOString();
       updatedChallenges[index].elapsedTime = getElapsedTime(updatedChallenges[index].startTime);
     }
-    // Якщо статус не 'done' (і не 'in progress'), тоді встановлюємо 'in progress'
-    else if (updatedChallenges[index].status !== 'done') {
+    else if (updatedChallenges[index].status === 'pending') {
       updatedChallenges[index].status = 'in progress';
       updatedChallenges[index].startTime = new Date().toISOString();
-      setElapsedTime('00:00:00');
     }
-  
-    // Якщо немає активної задачі зі статусом 'accept' – призначаємо наступну, що ще не виконана
-    const activeChallenge = updatedChallenges.find(ch => ch.status === 'accept');
-    if (!activeChallenge) {
-      const nextIndex = updatedChallenges.findIndex((ch, i) => i > index && ch.status !== 'done');
-      if (nextIndex !== -1) {
-        updatedChallenges[nextIndex].status = 'accept';
-        updatedChallenges[nextIndex].startTime = new Date().toISOString();
-        setElapsedTime('00:00:00');
-      } else {
-        const firstNotDone = updatedChallenges.findIndex(ch => ch.status !== 'done');
-        if (firstNotDone !== -1) {
-          updatedChallenges[firstNotDone].status = 'accept';
-          updatedChallenges[firstNotDone].startTime = new Date().toISOString();
-          setElapsedTime('00:00:00');
-        }
-      }
-    }
-  
+
     const updatedCurrentChallenge = {
       ...sweetTasks,
       tasks: updatedChallenges,
     };
-  
+
     setSweetTasks(updatedCurrentChallenge);
     await saveCurrentChallenge(updatedCurrentChallenge);
-  
+
     if (updatedChallenges.every(swTask => swTask.status === 'done')) {
-      const completedEntry = {
-        tasks: updatedChallenges,
-        allCompletedDate: new Date().toISOString(),
-      };
-  
+
+      const updatedLevelPoints = levelPoints + 1;
+      setLevelPoints(updatedLevelPoints);
+      await AsyncStorage.setItem('levelPoints', JSON.stringify(updatedLevelPoints));
+
+      generateSweetReward();
+      setIsTasksVisible(false);
       try {
-        const storedJournal = await AsyncStorage.getItem('sweetTasks');
-        const storedTasks = storedJournal ? JSON.parse(storedJournal) : [];
-        storedTasks.unshift(completedEntry);
-        await AsyncStorage.setItem('sweetTasks', JSON.stringify(storedTasks));
-        setSelectedUpBtn('Growth journal');
-        setSweetTasks(null);
-        setIsBeginWasVisible(false);
-        setIsDifficultWasVisible(false);
-        setSelectedDifficulty('');
-        setSelectedChallengeCategory('');
-        setElapsedTime('00:00:00');
+        const updatedJournalEntry = {
+          tasks: updatedChallenges,
+          allCompletedDate: new Date().toISOString(),
+        };
+        await AsyncStorage.setItem('sweetTasks', JSON.stringify(updatedJournalEntry));
       } catch (error) {
         console.error('Error saving to sweetTasks:', error);
       }
-  
-      await AsyncStorage.removeItem('sweetTasks');
-      setSweetTasks(null);
+    }
+  };
+
+  useEffect(() => {
+    console.log('userRewards', userRewards);
+    console.log('notAvailableRewards', notAvailableRewards);
+  }, [userRewards, notAvailableRewards]);
+
+  const generateSweetReward = async () => {
+    let candidateRewards = sweetRewards.filter(reward => {
+      return !notAvailableRewards.some(avReward => avReward.id === reward.id);
+    });
+
+    if (candidateRewards.length === 0) {
+      candidateRewards = [...sweetRewards];
+    }
+
+    if (notAvailableRewards.length >= 20) {
+      try {
+        await AsyncStorage.setItem('notAvailableRewards', JSON.stringify([]));
+        setNotAvailableRewards([]);
+      } catch (error) {
+        console.error('Error clearing notAvailableRewards:', error);
+      }
+    }
+
+    const newReward = candidateRewards[Math.floor(Math.random() * candidateRewards.length)];
+
+    const updatedRewards = [...notAvailableRewards, newReward];
+    setNotAvailableRewards(updatedRewards);
+
+    const newUserNewReward = {
+      ...newReward,
+      receivedDate: new Date().toISOString()
+    }
+    const updatedUserRewards = [...userRewards, newUserNewReward];
+    setUserRewards(updatedUserRewards);
+    await AsyncStorage.setItem('userRewards', JSON.stringify(updatedUserRewards));
+
+    setCurrentReward(newReward);
+    await AsyncStorage.setItem('currentReward', JSON.stringify(newReward));
+
+    try {
+      await AsyncStorage.setItem('notAvailableRewards', JSON.stringify(updatedRewards));
+    } catch (error) {
+      console.error('Error saving notAvailableRewards:', error);
     }
   };
 
   const saveCurrentChallenge = async (swTask) => {
     try {
-      await AsyncStorage.setItem('currentChallenge', JSON.stringify(swTask));
+      await AsyncStorage.setItem('sweetTasks', JSON.stringify(swTask));
     } catch (error) {
-      console.error('Error saving currentChallenge:', error);
+      console.error('Error saving sweetTasks:', error);
     }
   };
 
@@ -215,8 +275,7 @@ const SweetHomeScreenP = () => {
       ...task,
       status: 'pending'
     }));
-    // Створюємо об'єкт, що містить масив тасок у властивості tasks
-    const data = { tasks: selectedTasks };
+    const data = { tasks: selectedTasks, allCompletedDate: null };
     try {
       await AsyncStorage.setItem('sweetTasks', JSON.stringify(data));
     } catch (error) {
@@ -226,9 +285,19 @@ const SweetHomeScreenP = () => {
     return data;
   }
 
-  // useEffect(() => {
-  //   generateSweetTasks();
-  // }, [])
+  const getElapsedTime = (startTime) => {
+    if (!startTime) return '00:00:00';
+
+    const start = new Date(startTime);
+    const now = new Date();
+    const diff = now - start;
+
+    const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+  };
 
   const styles = mathSettingsStyles(dimensions);
 
@@ -308,6 +377,26 @@ const SweetHomeScreenP = () => {
     loadMathSettingsParams();
   }, [])
 
+  const getLevelInfo = (levelPoints) => {
+    if (levelPoints < 1) {
+      return { level: levels[0], start: 0, end: 10, progress: 0 };
+    } else if (levelPoints <= 10) {
+      return { level: levels[0], start: 1, end: 10, progress: (levelPoints - 1 + 1) / (10) };
+    } else if (levelPoints <= 20) {
+      return { level: levels[1], start: 11, end: 20, progress: (levelPoints - 11 + 1) / (10) };
+    } else if (levelPoints <= 29) {
+      return { level: levels[2], start: 21, end: 29, progress: (levelPoints - 21 + 1) / (9) };
+    } else if (levelPoints <= 39) {
+      return { level: levels[3], start: 30, end: 39, progress: (levelPoints - 30 + 1) / (10) };
+    } else if (levelPoints <= 50) {
+      return { level: levels[4], start: 40, end: 50, progress: (levelPoints - 40 + 1) / (11) };
+    } else {
+      return { level: levels[4], start: 40, end: 50, progress: 1 };
+    }
+  };
+
+  const levelInfo = getLevelInfo(levelPoints);
+
   return (
     <View style={{
       backgroundColor: '#FED9D3',
@@ -341,7 +430,7 @@ const SweetHomeScreenP = () => {
               justifyContent: 'center',
             }}>
               <Image
-                source={levels[0].image}
+                source={levelInfo.level.image} // використовуємо вибране з levels
                 style={{
                   width: dimensions.height * 0.04,
                   height: dimensions.height * 0.04,
@@ -357,10 +446,13 @@ const SweetHomeScreenP = () => {
               paddingVertical: dimensions.height * 0.008,
             }}>
               <Text style={[styles.montserratText, {
-                fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500',
+                fontSize: dimensions.width * 0.04,
+                textAlign: 'left',
+                alignSelf: 'flex-start',
+                fontWeight: '500',
                 color: '#582D45'
               }]}>
-                {levels[0].name}
+                {levelInfo.level.name}
               </Text>
 
               <View style={{
@@ -372,7 +464,7 @@ const SweetHomeScreenP = () => {
                 position: 'relative',
               }}>
                 <View style={{
-                  width: dimensions.width * 0.65 * 0.5,
+                  width: dimensions.width * 0.65 * levelInfo.progress, // заповнення шкали відповідно до progress
                   height: dimensions.height * 0.019,
                   backgroundColor: '#582D45',
                   borderRadius: dimensions.width * 0.04,
@@ -450,154 +542,10 @@ const SweetHomeScreenP = () => {
                 )}
               </TouchableOpacity>
 
-              {/* {isTasksVisible && (
-                [1, 2, 3].map((task, index) => (
-                  <View key={index} style={{
-                    width: '90%',
-                    alignSelf: 'center',
-                    marginTop: dimensions.height * 0.02,
-                    borderRadius: dimensions.width * 0.04,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                  }}>
-                    <View style={{
-                      height: dimensions.height * 0.05,
-                      width: dimensions.height * 0.05,
-                      borderRadius: dimensions.width * 0.04,
-                      borderColor: '#582D45',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderWidth: dimensions.width * 0.0025,
-                      alignSelf: 'flex-start',
-                    }}>
-                      <Text style={[styles.montserratText, {
-                        fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '500',
-                        color: '#582D45',
-                      }]}>
-                        {index + 1}
-                      </Text>
-                    </View>
-
-                    <View key={index} style={{
-                      width: dimensions.width * 0.75,
-                      alignSelf: 'center',
-                      backgroundColor: 'rgba(243, 203, 206, 1)',
-                      borderRadius: dimensions.width * 0.04,
-                      alignItems: 'center',
-                      marginLeft: dimensions.width * 0.04,
-                      paddingHorizontal: dimensions.width * 0.04,
-                      paddingVertical: dimensions.height * 0.015,
-                    }}>
-                      <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        alignSelf: 'flex-start',
-                      }}>
-                        <Image
-                          source={isTaskOpened
-                            ? require('../assets/icons/timeIcon.png')
-                            : require('../assets/icons/lockIcon.png')
-                          }
-                          style={{
-                            width: dimensions.width * 0.06,
-                            height: dimensions.width * 0.06,
-                            marginRight: dimensions.width * 0.015,
-                          }}
-                          resizeMode="contain"
-                        />
-                        <Text style={[styles.montserratText, {
-                          fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '400',
-                          color: '#B27396'
-                        }]}>
-                          {isTaskOpened ? '10 minutes' : 'Locked'}
-                        </Text>
-                      </View>
-                      <Text style={[styles.montserratText, {
-                        fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500',
-                        marginTop: dimensions.height * 0.01,
-                        color: '#582D45'
-                      }]}>
-                        {isTaskOpened
-                          ? 'Look through old photos and remember a good moment.'
-                          : 'Finish first task to open this'
-                        }
-                      </Text>
-
-                      {isTaskOpened && (
-                        <View style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'flex-start',
-                          width: '100%',
-                          marginTop: dimensions.height * 0.01,
-                        }}>
-                          <TouchableOpacity style={{
-                            paddingHorizontal: dimensions.width * 0.04,
-                            height: dimensions.height * 0.05,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: dimensions.width * 0.03,
-                            backgroundColor: '#582D45',
-                          }}>
-                            <Text style={[styles.montserratText, {
-                              fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '500',
-                              color: 'white'
-                            }]}>
-                              Start task
-                            </Text>
-                          </TouchableOpacity>
-
-                          <TouchableOpacity style={{
-                            width: dimensions.height * 0.05,
-                            height: dimensions.height * 0.05,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: dimensions.width * 0.03,
-                            borderWidth: dimensions.width * 0.003,
-                            borderColor: '#582D45',
-                            marginHorizontal: dimensions.width * 0.02,
-                          }}>
-                            <Image
-                              source={require('../assets/icons/shareSweetIcon.png')}
-                              style={{
-                                width: dimensions.height * 0.025,
-                                height: dimensions.height * 0.025,
-                              }}
-                              resizeMode="contain"
-                            />
-                          </TouchableOpacity>
-
-                          <TouchableOpacity style={{
-                            width: dimensions.height * 0.05,
-                            height: dimensions.height * 0.05,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: dimensions.width * 0.03,
-                            backgroundColor: '#582D45',
-                          }}>
-                            <Image
-                              source={require('../assets/icons/fullSweetHeartIcon.png')}
-                              style={{
-                                width: dimensions.height * 0.028,
-                                height: dimensions.height * 0.028,
-                              }}
-                              resizeMode="contain"
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                ))
-              )} */}
-
 
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
-                  paddingTop: dimensions.height * 0.05,
                   paddingBottom: dimensions.height * 0.14,
                   width: dimensions.width,
                 }}
@@ -605,7 +553,7 @@ const SweetHomeScreenP = () => {
               >
                 {sweetTasks && isTasksVisible &&
                   sweetTasks.tasks.map((swTask, index) => {
-                    // Таска розблокована, якщо це перша або попередня таска виконана:
+
                     const unlocked =
                       index === 0 || sweetTasks.tasks[index - 1].status === 'done';
                     return (
@@ -653,9 +601,11 @@ const SweetHomeScreenP = () => {
                             alignSelf: 'flex-start',
                           }}>
                             <Image
-                              source={isTaskOpened
-                                ? require('../assets/icons/timeIcon.png')
-                                : require('../assets/icons/lockIcon.png')
+                              source={!unlocked
+                                ? require('../assets/icons/lockIcon.png')
+                                : swTask.status === 'done'
+                                  ? require('../assets/icons/completeIcon.png')
+                                  : require('../assets/icons/timeIcon.png')
                               }
                               style={{
                                 width: dimensions.width * 0.06,
@@ -671,15 +621,18 @@ const SweetHomeScreenP = () => {
                               {unlocked && swTask.status !== 'done' ? '10 minutes' : swTask.status === 'done' ? 'Done' : 'Locked'}
                             </Text>
                           </View>
-                          <Text style={[styles.montserratText, {
-                            fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500',
-                            marginTop: dimensions.height * 0.01,
-                            color: '#582D45'
-                          }]}>
-                            {unlocked
-                              ? swTask.sweetTask
-                              : 'Finish previous task to unlock'}
-                          </Text>
+
+                          {swTask.status !== 'done' && (
+                            <Text style={[styles.montserratText, {
+                              fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500',
+                              marginTop: dimensions.height * 0.01,
+                              color: '#582D45'
+                            }]}>
+                              {unlocked
+                                ? swTask.sweetTask
+                                : 'Finish previous task to unlock'}
+                            </Text>
+                          )}
 
                           {unlocked && swTask.status !== 'done' && (
                             <View style={{
@@ -690,7 +643,7 @@ const SweetHomeScreenP = () => {
                               marginTop: dimensions.height * 0.01,
                             }}>
                               <TouchableOpacity style={{
-                                paddingHorizontal: dimensions.width * 0.04,
+                                width: dimensions.width * 0.3,
                                 height: dimensions.height * 0.05,
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -704,7 +657,7 @@ const SweetHomeScreenP = () => {
                                   fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '500',
                                   color: 'white'
                                 }]}>
-                                  Start task
+                                  {swTask.status === 'pending' ? 'Start task' : 'Finish'}
                                 </Text>
                               </TouchableOpacity>
 
@@ -748,189 +701,146 @@ const SweetHomeScreenP = () => {
                             </View>
                           )}
                         </View>
-
-                        <View style={{ width: dimensions.width * 0.9, alignSelf: 'center' }}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'flex-start',
-                              alignItems: 'flex-start',
-                              width: dimensions.width * 0.9,
-                              alignSelf: 'center',
-                            }}
-                          >
-                            <View style={{ marginLeft: dimensions.width * 0.03, top: -dimensions.height * 0.005 }}>
-                              <Text
-                                style={{
-                                  fontFamily: fontMontserratRegular,
-                                  color: 'white',
-                                  fontSize: dimensions.width * 0.04,
-                                  textAlign: 'left',
-                                  fontWeight: 500,
-                                  maxWidth: dimensions.width * 0.7,
-                                }}
-                              >
-                                {unlocked ? swTask.title : 'Locked'}
-                              </Text>
-                              <Text
-                                style={{
-                                  fontFamily: fontMontserratRegular,
-                                  color: 'white',
-                                  fontSize: dimensions.width * 0.04,
-                                  textAlign: 'left',
-                                  fontWeight: 500,
-                                  maxWidth: dimensions.width * 0.7,
-                                }}
-                              >
-                                {unlocked
-                                  ? swTask.sweetTask
-                                  : 'Finish previous task to unlock'}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                        <View
-                          style={{
-                            width: dimensions.width * 0.9,
-                            alignSelf: 'center',
-                            marginTop: dimensions.height * 0.019,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            marginBottom: dimensions.height * 0.025,
-                          }}
-                        >
-                          {unlocked ? (
-                            <TouchableOpacity
-                              disabled={swTask.status === 'done'}
-                              onPress={() => handleAcceptChallenge(index)}
-                              style={{
-                                width: dimensions.width * 0.43,
-                                backgroundColor: swTask.status === 'done' ? '#FB8A8A' : '#9FE7B3',
-                                borderRadius: dimensions.width * 0.025,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: dimensions.height * 0.05,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  fontFamily: fontMontserratRegular,
-                                  color: 'black',
-                                  fontSize: dimensions.width * 0.04,
-                                  textAlign: 'left',
-                                  fontWeight: 600,
-                                }}
-                              >
-                                {swTask.status === 'done' ? 'Done' : 'Accept'}
-                              </Text>
-                            </TouchableOpacity>
-                          ) : (
-                            <View
-                              style={{
-                                width: dimensions.width * 0.43,
-                                backgroundColor: 'gray',
-                                borderRadius: dimensions.width * 0.025,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: dimensions.height * 0.05,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  fontFamily: fontMontserratRegular,
-                                  color: 'white',
-                                  fontSize: dimensions.width * 0.04,
-                                  textAlign: 'center',
-                                  fontWeight: 600,
-                                }}
-                              >
-                                Locked
-                              </Text>
-                            </View>
-                          )}
-                          {unlocked && (
-                            <View
-                              style={{
-                                width: dimensions.width * 0.43,
-                                backgroundColor: 'white',
-                                borderRadius: dimensions.width * 0.025,
-                                borderColor: swTask.status === 'done' ? '#9FE7B3' : '#FB8A8A',
-                                borderWidth: dimensions.width * 0.01,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                height: dimensions.height * 0.05,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  fontFamily: fontMontserratRegular,
-                                  color: 'black',
-                                  fontSize: dimensions.width * 0.035,
-                                  textAlign: 'left',
-                                  fontWeight: 600,
-                                }}
-                              >
-                                {swTask.status === 'done' ? swTask.elapsedTime : elapsedTime}
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-                        {unlocked && (
-                          <TouchableOpacity
-                            onPress={() => handleAcceptChallenge(index)}
-                            disabled={swTask.status === 'done'}
-                          >
-                            <Image
-                              source={require('../assets/icons/completeIcon.png')}
-                              style={{
-                                alignSelf: 'center',
-                                width: dimensions.width * 0.14,
-                                height: dimensions.height * 0.14,
-                                top: -dimensions.height * 0.061,
-                              }}
-                              resizeMode='contain'
-                            />
-                          </TouchableOpacity>
-                        )}
                       </View>
                     );
                   })}
 
-                <View style={{
-                  width: '90%',
-                  backgroundColor: '#5C2E45',
-                  marginTop: isTasksVisible ? dimensions.height * 0.02 : -dimensions.height * 0.02,
-                  borderRadius: dimensions.width * 0.04,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingVertical: dimensions.height * 0.02,
-                  paddingHorizontal: dimensions.width * 0.04,
-                  alignSelf: 'center',
-                }}>
-                  <Image
-                    source={require('../assets/icons/whiteRewardIcon.png')}
-                    style={{
-                      width: dimensions.height * 0.06,
-                      height: dimensions.height * 0.06,
-                      marginRight: dimensions.width * 0.03,
-                    }}
-                    resizeMode="contain"
-                  />
-                  <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '500' }]}>
-                    Your reward:
-                  </Text>
+                {sweetTasks.tasks.filter((task) => task.status === 'done').length < 3 ? (
+                  <View style={{
+                    width: '90%',
+                    backgroundColor: '#5C2E45',
+                    marginTop: dimensions.height * 0.02,
+                    borderRadius: dimensions.width * 0.04,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingVertical: dimensions.height * 0.02,
+                    paddingHorizontal: dimensions.width * 0.04,
+                    alignSelf: 'center',
+                  }}>
+                    <Image
+                      source={require('../assets/icons/whiteRewardIcon.png')}
+                      style={{
+                        width: dimensions.height * 0.06,
+                        height: dimensions.height * 0.06,
+                        marginRight: dimensions.width * 0.03,
+                      }}
+                      resizeMode="contain"
+                    />
+                    <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '500' }]}>
+                      Your reward:
+                    </Text>
 
-                  <Text style={[styles.montserratText, {
-                    fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '400',
-                    paddingHorizontal: dimensions.width * 0.07,
-                    marginTop: dimensions.height * 0.01,
-                  }]}>
-                    Finish all daily tasks to unlock your daily reward
-                  </Text>
-                </View>
+                    <Text style={[styles.montserratText, {
+                      fontSize: dimensions.width * 0.04, textAlign: 'center', fontWeight: '400',
+                      paddingHorizontal: dimensions.width * 0.07,
+                      marginTop: dimensions.height * 0.01,
+                    }]}>
+                      Finish all daily tasks to unlock your daily reward
+                    </Text>
+                  </View>
+                ) : (
+                  <>
+                    <View style={[styles.header, {
+                      marginTop: dimensions.height * 0.02,
+                    }]}>
+                      <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500' }]}>
+                        Your reward:
+                      </Text>
+                    </View>
+
+                    <View style={{
+                      width: '90%',
+                      alignSelf: 'center',
+                      paddingVertical: dimensions.height * 0.015,
+                      paddingHorizontal: dimensions.width * 0.05,
+                      backgroundColor: 'rgba(243, 203, 206, 1)',
+                      marginTop: dimensions.height * 0.02,
+                      borderRadius: dimensions.width * 0.04,
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                    }}>
+                      <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        width: '100%',
+                      }}>
+                        <Image
+                          source={require('../assets/icons/rewardIcon.png')}
+                          style={{
+                            width: dimensions.width * 0.06,
+                            height: dimensions.width * 0.06,
+                            marginRight: dimensions.width * 0.02,
+                          }}
+                          resizeMode="contain"
+                        />
+                        <Text style={[styles.montserratText, {
+                          fontSize: dimensions.width * 0.04, textAlign: 'left', fontWeight: '400',
+                          color: '#B27396'
+                        }]}>
+                          Daily Affirmation
+                        </Text>
+                      </View>
+
+                      <Text style={[styles.montserratText, {
+                        fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500',
+                        marginTop: dimensions.height * 0.01,
+                        color: '#582D45'
+                      }]}>
+                        {currentReward ? currentReward.sweetReward : 'Look through old photos and remember a good moment.'}
+                      </Text>
+
+                      <TouchableOpacity style={{
+                        width: dimensions.width * 0.12,
+                        height: dimensions.width * 0.12,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: dimensions.width * 0.03,
+                        borderWidth: dimensions.width * 0.003,
+                        borderColor: '#582D45',
+                        marginTop: dimensions.height * 0.01,
+                        alignSelf: 'flex-start',
+                      }}
+                        onPress={() => {
+                          Share.share({
+                            message: `I received a reward '${currentReward.sweetReward}'.`,
+                          });
+                        }}
+                      >
+                        <Image
+                          source={require('../assets/icons/shareSweetIcon.png')}
+                          style={{
+                            width: dimensions.width * 0.06,
+                            height: dimensions.width * 0.06,
+                          }}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={async () => {
+                        await AsyncStorage.removeItem('sweetTasks');
+                        setSweetTasks(null);
+                        await AsyncStorage.removeItem('currentReward');
+                        setCurrentReward(null);
+                      }}
+                    >
+                      <Image
+                        source={require('../assets/images/finishButton.png')}
+                        style={{
+                          width: '90%',
+                          height: dimensions.height * 0.07,
+                          marginTop: dimensions.height * 0.02,
+                          alignSelf: 'center',
+                          borderRadius: dimensions.width * 0.04,
+                        }}
+                        resizeMode="cover"
+                      />
+                    </TouchableOpacity>
+                  </>
+                )}
               </ScrollView>
-
-
             </>
           )}
 
@@ -946,11 +856,11 @@ const SweetHomeScreenP = () => {
           setSweetVibrOn={setSweetVibrOn}
         />
       ) : choosedSweetScreen === 'My progress' ? (
-        <SweetProgressScreen setChoosedSweetScreen={setChoosedSweetScreen} />
+        <SweetProgressScreen setChoosedSweetScreen={setChoosedSweetScreen} levelPoints={levelPoints}/>
       ) : choosedSweetScreen === 'Saved' ? (
         <SweetSavedScreen setChoosedSweetScreen={setChoosedSweetScreen} />
       ) : choosedSweetScreen === 'My rewards' ? (
-        <SweetMyRewardsScreen setChoosedSweetScreen={setChoosedSweetScreen} />
+        <SweetMyRewardsScreen setChoosedSweetScreen={setChoosedSweetScreen} userRewards={userRewards} />
       ) : null}
 
       <View style={{

@@ -42,7 +42,36 @@ const levels = [
     },
 ]
 
-const SweetProgressScreen = ({}) => {
+const getProgressForLevel = (level, levelPoints) => {
+    let lower, upper;
+    switch (level.id) {
+        case 1:
+            lower = 1; upper = 10;
+            break;
+        case 2:
+            lower = 11; upper = 20;
+            break;
+        case 3:
+            lower = 21; upper = 29;
+            break;
+        case 4:
+            lower = 30; upper = 39;
+            break;
+        case 5:
+            lower = 40; upper = 50;
+            break;
+        default:
+            lower = 0; upper = 0;
+    }
+    // Якщо точки менше нижньої межі – нульове заповнення
+    if (levelPoints < lower) return 0;
+    // Якщо рівень повністю пройдений – заповнення 100%
+    if (levelPoints >= upper) return 1;
+    // Обчислюємо прогрес: скільки кроків пройдено проти всіх кроків рівня
+    return (levelPoints - lower + 1) / (upper - lower + 1);
+};
+
+const SweetProgressScreen = ({ levelPoints }) => {
     const dimensions = Dimensions.get('window');
     const styles = mathSettingsStyles(dimensions);
 
@@ -54,69 +83,75 @@ const SweetProgressScreen = ({}) => {
                 </Text>
             </View>
 
-            {levels.map((level, index) => (
-                <View key={level.id} style={{
-                    width: '90%',
-                    alignSelf: 'center',
-                    height: dimensions.height * 0.07,
-                    backgroundColor: 'rgba(243, 203, 206, 1)',
-                    marginTop: dimensions.height * 0.02,
-                    borderRadius: dimensions.width * 0.04,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                }}>
-                    <View style={{
+            {levels.map((level, index) => {
+                const progress = getProgressForLevel(level, levelPoints);
+                return (
+                    <View key={level.id} style={{
+                        width: '90%',
+                        alignSelf: 'center',
                         height: dimensions.height * 0.07,
-                        width: dimensions.height * 0.07,
+                        backgroundColor: 'rgba(243, 203, 206, 1)',
+                        marginTop: dimensions.height * 0.02,
                         borderRadius: dimensions.width * 0.04,
-                        backgroundColor: '#582D45',
+                        flexDirection: 'row',
                         alignItems: 'center',
-                        justifyContent: 'center',
+                        justifyContent: 'flex-start',
                     }}>
-                        <Image
-                            source={level.image}
-                            style={{
-                                width: dimensions.height * 0.04,
-                                height: dimensions.height * 0.04,
-                            }}
-                            resizeMode="contain"
-                        />
-                    </View>
-
-                    <View style={{
-                        width: '100%',
-                        height: '100%',
-                        marginLeft: dimensions.width * 0.04,
-                        paddingVertical: dimensions.height * 0.008,
-                    }}>
-                        <Text style={[styles.montserratText, {
-                            fontSize: dimensions.width * 0.04, textAlign: 'left', alignSelf: 'flex-start', fontWeight: '500',
-                            color: '#582D45'
-                        }]}>
-                            {level.name}
-                        </Text>
+                        <View style={{
+                            height: dimensions.height * 0.07,
+                            width: dimensions.height * 0.07,
+                            borderRadius: dimensions.width * 0.04,
+                            backgroundColor: '#582D45',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <Image
+                                source={level.image}
+                                style={{
+                                    width: dimensions.height * 0.04,
+                                    height: dimensions.height * 0.04,
+                                }}
+                                resizeMode="contain"
+                            />
+                        </View>
 
                         <View style={{
-                            width: dimensions.width * 0.65,
-                            height: dimensions.height * 0.019,
-                            backgroundColor: 'white',
-                            borderRadius: dimensions.width * 0.04,
-                            marginTop: dimensions.height * 0.01,
-                            position: 'relative',
+                            width: '100%',
+                            height: '100%',
+                            marginLeft: dimensions.width * 0.04,
+                            paddingVertical: dimensions.height * 0.008,
                         }}>
+                            <Text style={[styles.montserratText, {
+                                fontSize: dimensions.width * 0.04,
+                                textAlign: 'left',
+                                alignSelf: 'flex-start',
+                                fontWeight: '500',
+                                color: '#582D45'
+                            }]}>
+                                {level.name}
+                            </Text>
+
                             <View style={{
-                                width: dimensions.width * 0.65 * 0.5,
+                                width: dimensions.width * 0.65,
                                 height: dimensions.height * 0.019,
-                                backgroundColor: '#582D45',
+                                backgroundColor: 'white',
                                 borderRadius: dimensions.width * 0.04,
-                                position: 'absolute',
-                                left: 0,
-                            }} />
+                                marginTop: dimensions.height * 0.01,
+                                position: 'relative',
+                            }}>
+                                <View style={{
+                                    width: dimensions.width * 0.65 * progress, // заповнення залежить від обчисленого progress
+                                    height: dimensions.height * 0.019,
+                                    backgroundColor: '#582D45',
+                                    borderRadius: dimensions.width * 0.04,
+                                    position: 'absolute',
+                                    left: 0,
+                                }} />
+                            </View>
                         </View>
                     </View>
-                </View>
-            ))}
+                );
+            })}
 
             <TouchableOpacity style={{
                 width: '90%',
@@ -131,7 +166,7 @@ const SweetProgressScreen = ({}) => {
             }}>
                 <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.045, textAlign: 'center', alignSelf: 'center', fontWeight: '400' }]}>
                     Share my progress
-                </Text> 
+                </Text>
             </TouchableOpacity>
         </SafeAreaView>
     );
