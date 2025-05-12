@@ -43,32 +43,8 @@ const levels = [
 ]
 
 const getProgressForLevel = (level, levelPoints) => {
-    let lower, upper;
-    switch (level.id) {
-        case 1:
-            lower = 1; upper = 10;
-            break;
-        case 2:
-            lower = 11; upper = 20;
-            break;
-        case 3:
-            lower = 21; upper = 29;
-            break;
-        case 4:
-            lower = 30; upper = 39;
-            break;
-        case 5:
-            lower = 40; upper = 50;
-            break;
-        default:
-            lower = 0; upper = 0;
-    }
-    // Якщо точки менше нижньої межі – нульове заповнення
-    if (levelPoints < lower) return 0;
-    // Якщо рівень повністю пройдений – заповнення 100%
-    if (levelPoints >= upper) return 1;
-    // Обчислюємо прогрес: скільки кроків пройдено проти всіх кроків рівня
-    return (levelPoints - lower + 1) / (upper - lower + 1);
+    const threshold = level.id * 10;
+    return Math.min(1, levelPoints / threshold);
 };
 
 const SweetProgressScreen = ({ levelPoints }) => {
