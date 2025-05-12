@@ -82,7 +82,6 @@ const SweetProgressScreen = ({}) => {
                             }}
                             resizeMode="contain"
                         />
-
                     </View>
 
                     <View style={{
