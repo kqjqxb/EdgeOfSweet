@@ -11,16 +11,13 @@ const SweetAppLoading = () => {
   const navigation = useNavigation();
   const { setUser } = useContext(UserContext);
   const dispatch = useDispatch();
-  const dimensions = Dimensions.get('window');
 
   const [isSweetLoadingVisibledYet, setSweetLoadingVisibledYet] = useState(false);
   const [isSweetLoadingYet, setSweetLoadingYet] = useState(false);
 
-  // Створюємо animated value для масштабування
   const scaleValue = useRef(new Animated.Value(0.1)).current;
 
   useEffect(() => {
-    // Анімація збільшення з 0.1 до 1 протягом 2554 мс
     Animated.timing(scaleValue, {
       toValue: 1,
       duration: 2554,
@@ -61,11 +58,11 @@ const SweetAppLoading = () => {
 
   useEffect(() => {
     if (isSweetLoadingYet) {
-      const timer = setTimeout(() => {
+      const sweetTimer = setTimeout(() => {
         const destination = isSweetLoadingVisibledYet ? 'SweetOnboardingSP' : 'SweetHomeScreenP';
         navigation.replace(destination);
       }, 2554);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(sweetTimer);
     }
   }, [isSweetLoadingYet, isSweetLoadingVisibledYet, navigation]);
 

@@ -13,7 +13,6 @@ const fontMontserratRegular = 'Montserrat-Regular';
 const fontNunitoRegular = 'Nunito-Regular';
 
 const SweetSettingsScreen = ({
-    setChoosedSweetScreen,
     isSweetMusicOn,
     setSweetMusicOn,
     isSweetNotificationsOn,
@@ -22,7 +21,7 @@ const SweetSettingsScreen = ({
     setSweetVibrOn
 }) => {
     const dimensions = Dimensions.get('window');
-    const styles = mathSettingsStyles(dimensions);
+    const styles = sweetStyles(dimensions);
 
     const sweetSaveSettings = async (key, value) => {
         try {
@@ -98,7 +97,7 @@ const SweetSettingsScreen = ({
     );
 };
 
-const mathSettingsStyles = (dimensions) => StyleSheet.create({
+const sweetStyles = (dimensions) => StyleSheet.create({
     header: {
         width: '90%',
         height: dimensions.height * 0.07,

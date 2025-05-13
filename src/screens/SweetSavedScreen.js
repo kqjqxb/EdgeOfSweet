@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -17,7 +17,7 @@ const fontMontserratRegular = 'Montserrat-Regular';
 
 const SweetSavedScreen = ({ sweetFavTasks, setSweetFavTasks }) => {
     const dimensions = Dimensions.get('window');
-    const styles = mathSettingsStyles(dimensions);
+    const styles = sweetStyles(dimensions);
 
     return (
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
@@ -165,7 +165,7 @@ const SweetSavedScreen = ({ sweetFavTasks, setSweetFavTasks }) => {
     );
 };
 
-const mathSettingsStyles = (dimensions) => StyleSheet.create({
+const sweetStyles = (dimensions) => StyleSheet.create({
     header: {
         width: '90%',
         height: dimensions.height * 0.07,

@@ -15,8 +15,6 @@ import { ChevronDownIcon, ChevronUpIcon } from 'react-native-heroicons/solid';
 import SweetSettingsScreen from './SweetSettingsScreen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Sound from 'react-native-sound';
-import { useAudio } from '../context/AudioContext';
 import SweetProgressScreen from './SweetProgressScreen';
 import SweetSavedScreen from './SweetSavedScreen';
 import SweetMyRewardsScreen from './SweetMyRewardsScreen';
@@ -95,21 +93,19 @@ const SweetHomeScreenP = () => {
   const [isSweetNotificationsOn, setSweetNotificationsOn] = useState(true);
   const [isSweetVibrOn, setSweetVibrOn] = useState(true);
 
-  const [isTasksGiven, setIsTasksGiven] = useState(false);
   const [isTasksVisible, setIsTasksVisible] = useState(false);
-  const [isTaskOpened, setIsTaskOpened] = useState(false);
   const [userRewards, setUserRewards] = useState([]);
   const [notAvailableRewards, setNotAvailableRewards] = useState([]);
   const [currentReward, setCurrentReward] = useState(null);
   const [levelPoints, setLevelPoints] = useState(0);
 
   const [sweetTasks, setSweetTasks] = useState(null);
-  const [timeCompletedDSTask, setTimeCompletedDSTask] = useState(null);
   const [isSweetTaskAvailable, setIsSweetTaskAvailable] = useState(true);
   const [sweetFavTasks, setSweetFavTasks] = useState([]);
 
+  const [lastCompletedTaskTime, setLastCompletedTaskTime] = useState(null);
+
   useEffect(() => {
-    console.log('\n\nsweetFavTasks', sweetFavTasks);
     const loadFavTasks = async () => {
       try {
         const storedFav = await AsyncStorage.getItem('sweetFavTasks');
@@ -124,24 +120,28 @@ const SweetHomeScreenP = () => {
   }, [choosedSweetScreen]);
 
   useEffect(() => {
-    const loadTimeCompleted = async () => {
+    const loadLastTaskTime = async () => {
       try {
-        const storedTime = await AsyncStorage.getItem('timeCompletedDSTask');
+        const storedTime = await AsyncStorage.getItem('lastCompletedTaskTime');
         if (storedTime) {
-          setTimeCompletedDSTask(JSON.parse(storedTime));
-        } else {
-          setTimeCompletedDSTask(null);
+          setLastCompletedTaskTime(JSON.parse(storedTime));
         }
       } catch (error) {
-        console.error('Error loading timeCompletedDSTask:', error);
+        console.error('Error loading lastCompletedTaskTime:', error);
       }
     };
-    loadTimeCompleted();
+    loadLastTaskTime();
   }, []);
 
   useEffect(() => {
-    console.log('sweetTasks', sweetTasks);
-  }, [sweetTasks]);
+    const now = new Date();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+    const timer = setTimeout(() => {
+      setLastCompletedTaskTime(null);
+    }, msUntilMidnight);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const loadUserRewards = async () => {
@@ -196,12 +196,7 @@ const SweetHomeScreenP = () => {
 
   }, [choosedSweetScreen]);
 
-  useEffect(() => {
-    console.log('levelPoints', levelPoints);
-  }, [levelPoints]);
-
-
-  const handleAcceptChallenge = async (index) => {
+  const updateTaskStatus = async (index) => {
     if (typeof isSweetVibrOn !== 'undefined' && isSweetVibrOn) {
       ReactNativeHapticFeedback.trigger("impactLight", {
         enableVibrateFallback: true,
@@ -209,42 +204,37 @@ const SweetHomeScreenP = () => {
       });
     }
 
-    const updatedChallenges = [...sweetTasks.tasks];
+    const updatedSweetTasks = [...sweetTasks.tasks];
 
-    if (updatedChallenges[index].status === 'in progress') {
-      updatedChallenges[index].status = 'done';
-      updatedChallenges[index].endTime = new Date().toISOString();
-      updatedChallenges[index].elapsedTime = getElapsedTime(updatedChallenges[index].startTime);
+    if (updatedSweetTasks[index].status === 'in progress') {
+      updatedSweetTasks[index].status = 'done';
+      updatedSweetTasks[index].endTime = new Date().toISOString();
     }
-    else if (updatedChallenges[index].status === 'pending') {
-      updatedChallenges[index].status = 'in progress';
-      updatedChallenges[index].startTime = new Date().toISOString();
+    else if (updatedSweetTasks[index].status === 'pending') {
+      updatedSweetTasks[index].status = 'in progress';
+      updatedSweetTasks[index].startTime = new Date().toISOString();
     }
 
-    const updatedCurrentChallenge = {
+    const updatedThisSweetTask = {
       ...sweetTasks,
-      tasks: updatedChallenges,
+      tasks: updatedSweetTasks,
     };
 
-    setSweetTasks(updatedCurrentChallenge);
-    await saveCurrentChallenge(updatedCurrentChallenge);
+    setSweetTasks(updatedThisSweetTask);
+    await saveThisSweetTask(updatedThisSweetTask);
 
-    if (updatedChallenges.every(swTask => swTask.status === 'done')) {
-      const currentTime = new Date().toISOString();
-
+    if (updatedSweetTasks.every(swTask => swTask.status === 'done')) {
       const updatedLevelPoints = levelPoints + 1;
       setLevelPoints(updatedLevelPoints);
       await AsyncStorage.setItem('levelPoints', JSON.stringify(updatedLevelPoints));
-
       generateSweetReward();
       setIsTasksVisible(false);
       try {
-        const updatedJournalEntry = {
-          tasks: updatedChallenges,
+        const updatedSweetTasksHere = {
+          tasks: updatedSweetTasks,
           allCompletedDate: new Date().toISOString(),
-          timeCompletedDSTask: currentTime,
         };
-        await AsyncStorage.setItem('sweetTasks', JSON.stringify(updatedJournalEntry));
+        await AsyncStorage.setItem('sweetTasks', JSON.stringify(updatedSweetTasksHere));
       } catch (error) {
         console.error('Error saving to sweetTasks:', error);
       }
@@ -254,7 +244,6 @@ const SweetHomeScreenP = () => {
   const checkTaskAvailable = (completedTimeStr) => {
     if (!completedTimeStr) return true;
     const completedTime = new Date(completedTimeStr);
-    // Обчислюємо наступну опівночі після часу завершення
     const nextAvailable = new Date(
       completedTime.getFullYear(),
       completedTime.getMonth(),
@@ -265,13 +254,8 @@ const SweetHomeScreenP = () => {
   };
 
   useEffect(() => {
-    setIsSweetTaskAvailable(checkTaskAvailable(timeCompletedDSTask));
-  }, [timeCompletedDSTask]);
-
-  useEffect(() => {
-    console.log('userRewards', userRewards);
-    console.log('notAvailableRewards', notAvailableRewards);
-  }, [userRewards, notAvailableRewards]);
+    setIsSweetTaskAvailable(checkTaskAvailable(lastCompletedTaskTime));
+  }, [lastCompletedTaskTime]);
 
   const generateSweetReward = async () => {
     let candidateRewards = sweetRewards.filter(reward => {
@@ -314,7 +298,7 @@ const SweetHomeScreenP = () => {
     }
   };
 
-  const saveCurrentChallenge = async (swTask) => {
+  const saveThisSweetTask = async (swTask) => {
     try {
       await AsyncStorage.setItem('sweetTasks', JSON.stringify(swTask));
     } catch (error) {
@@ -342,25 +326,11 @@ const SweetHomeScreenP = () => {
     return data;
   }
 
-  const getElapsedTime = (startTime) => {
-    if (!startTime) return '00:00:00';
-
-    const start = new Date(startTime);
-    const now = new Date();
-    const diff = now - start;
-
-    const hours = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-
-    return `${hours}:${minutes}:${seconds}`;
-  };
-
-  const styles = mathSettingsStyles(dimensions);
+  const styles = sweetStyles(dimensions);
 
 
   useEffect(() => {
-    const loadMathSettingsParams = async () => {
+    const loadSweetSetsOfApp = async () => {
       try {
         const sweetMusicFromStorage = await AsyncStorage.getItem('isSweetMusicOn');
 
@@ -380,11 +350,11 @@ const SweetHomeScreenP = () => {
           setSweetNotificationsOn(JSON.parse(sweetNotificationsFromStorage));
         }
       } catch (error) {
-        console.error('Error loading math params:', error);
+        console.error('Error loading sweet setts of the app', error);
       }
     };
 
-    loadMathSettingsParams();
+    loadSweetSetsOfApp();
   }, [])
 
   const getLevelInfo = (levelPoints) => {
@@ -407,12 +377,23 @@ const SweetHomeScreenP = () => {
 
   const levelInfo = getLevelInfo(levelPoints);
 
+  const isToday = (dateStr) => {
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
   return (
     <View style={{
       backgroundColor: '#FED9D3',
       width: '100%',
-      flex: 1,
       height: dimensions.height,
+      flex: 1,
     }}>
       {choosedSweetScreen === 'Home' ? (
         <SafeAreaView style={{
@@ -474,7 +455,7 @@ const SweetHomeScreenP = () => {
                 position: 'relative',
               }}>
                 <View style={{
-                  width: dimensions.width * 0.65 * levelInfo.progress, // заповнення шкали відповідно до progress
+                  width: dimensions.width * 0.65 * levelInfo.progress,
                   height: dimensions.height * 0.019,
                   backgroundColor: '#582D45',
                   borderRadius: dimensions.width * 0.04,
@@ -484,7 +465,7 @@ const SweetHomeScreenP = () => {
               </View>
             </View>
           </View>
-          {isSweetTaskAvailable ? (
+          {(!lastCompletedTaskTime || !isToday(lastCompletedTaskTime)) ? (
             !sweetTasks || sweetTasks.length === 0 ? (
               <>
                 <Image
@@ -504,7 +485,6 @@ const SweetHomeScreenP = () => {
                 </View>
 
                 <TouchableOpacity onPress={() => {
-                  setIsTasksGiven(true);
                   generateSweetTasks();
                 }} style={{
                   width: '90%',
@@ -661,7 +641,7 @@ const SweetHomeScreenP = () => {
                                   borderRadius: dimensions.width * 0.03,
                                   backgroundColor: '#582D45',
                                 }}
-                                  onPress={() => handleAcceptChallenge(index)}
+                                  onPress={() => updateTaskStatus(index)}
                                   disabled={swTask.status === 'done'}
                                 >
                                   <Text style={[styles.montserratText, {
@@ -735,7 +715,7 @@ const SweetHomeScreenP = () => {
                                     }
                                   }}>
                                   <Image
-                                    source={ !sweetFavTasks.includes(swTask.id)
+                                    source={!sweetFavTasks.includes(swTask.id)
                                       ? require('../assets/icons/sweetPurpleHeart.png')
                                       : require('../assets/icons/fullSweetHeartIcon.png')
                                     }
@@ -872,6 +852,10 @@ const SweetHomeScreenP = () => {
                           setSweetTasks(null);
                           await AsyncStorage.removeItem('currentReward');
                           setCurrentReward(null);
+
+                          const currentTime = new Date().toISOString();
+                          await AsyncStorage.setItem('lastCompletedTaskTime', JSON.stringify(currentTime));
+                          setLastCompletedTaskTime(currentTime);
                         }}
                       >
                         <Image
@@ -934,7 +918,7 @@ const SweetHomeScreenP = () => {
       ) : choosedSweetScreen === 'My progress' ? (
         <SweetProgressScreen setChoosedSweetScreen={setChoosedSweetScreen} levelPoints={levelPoints} />
       ) : choosedSweetScreen === 'Saved' ? (
-        <SweetSavedScreen setChoosedSweetScreen={setChoosedSweetScreen} sweetFavTasks={sweetFavTasks} setSweetFavTasks={setSweetFavTasks}/>
+        <SweetSavedScreen setChoosedSweetScreen={setChoosedSweetScreen} sweetFavTasks={sweetFavTasks} setSweetFavTasks={setSweetFavTasks} />
       ) : choosedSweetScreen === 'My rewards' ? (
         <SweetMyRewardsScreen setChoosedSweetScreen={setChoosedSweetScreen} userRewards={userRewards} />
       ) : null}
@@ -989,7 +973,7 @@ const SweetHomeScreenP = () => {
   );
 };
 
-const mathSettingsStyles = (dimensions) => StyleSheet.create({
+const sweetStyles = (dimensions) => StyleSheet.create({
   header: {
     width: '90%',
     height: dimensions.height * 0.07,

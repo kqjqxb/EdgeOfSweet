@@ -7,7 +7,7 @@ const fontMontserratRegular = 'Montserrat-Regular';
 
 const EdgeOnboardingOfSweetScreen = () => {
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
-  const [thisNathIndexSlide, setThisNathIndexSlide] = useState(0);
+  const [idOfTheSweetSlide, setIdOfTheSweetSlide] = useState(0);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -23,30 +23,30 @@ const EdgeOnboardingOfSweetScreen = () => {
   return (
     <View
       style={{
-        backgroundColor: '#FED9D3',
-        flex: 1,
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        flex: 1,
+        backgroundColor: '#FED9D3',
       }}
     >
       <Image
         source={require('../assets/images/edgeOfSweetLogo.png')}
         style={{
-          alignSelf: 'center',
+          width: dimensions.width * 0.7,
           height: dimensions.height * 0.4,
           marginTop: dimensions.height * 0.1,
-          width: dimensions.width * 0.7,
+          alignSelf: 'center',
         }}
         resizeMode="contain"
       />
       <View style={{
-        backgroundColor: '#F3CBCE',
         height: dimensions.height * 0.3,
-        display: 'flex',
-        borderTopLeftRadius: dimensions.width * 0.04,
         borderTopRightRadius: dimensions.width * 0.04,
+        borderTopLeftRadius: dimensions.width * 0.04,
+        backgroundColor: '#F3CBCE',
         shadowColor: '#582D45',
         paddingTop: dimensions.height * 0.03,
+        display: 'flex',
 
         shadowOffset: {
           width: 0,
@@ -58,9 +58,9 @@ const EdgeOnboardingOfSweetScreen = () => {
       }}>
         <View style={{
           alignItems: 'center',
-          justifyContent: 'space-between',
           width: dimensions.width,
           flex: 1,
+          justifyContent: 'space-between',
         }}>
           <View style={{
             alignSelf: 'center',
@@ -69,26 +69,26 @@ const EdgeOnboardingOfSweetScreen = () => {
           }}>
             <Text
               style={{
-                color: '#582D45',
+                fontWeight: 700,
                 textAlign: 'center',
                 fontSize: dimensions.width * 0.06,
-                paddingHorizontal: dimensions.width * 0.05,
                 fontFamily: fontMontserratRegular,
-                fontWeight: 700,
+                paddingHorizontal: dimensions.width * 0.05,
+                color: '#582D45',
               }}>
-              {sweetDataOfOnboarding[thisNathIndexSlide].sweetUpTitle}
+              {sweetDataOfOnboarding[idOfTheSweetSlide].sweetUpTitle}
             </Text>
 
             <Text
               style={{
-                fontFamily: fontMontserratRegular,
+                color: '#582D45',
                 textAlign: 'center',
                 marginTop: dimensions.height * 0.015,
-                color: '#582D45',
-                fontSize: dimensions.width * 0.04,
                 paddingHorizontal: dimensions.width * 0.05,
+                fontFamily: fontMontserratRegular,
+                fontSize: dimensions.width * 0.04,
               }}>
-              {sweetDataOfOnboarding[thisNathIndexSlide].sweetDescription}
+              {sweetDataOfOnboarding[idOfTheSweetSlide].sweetDescription}
             </Text>
           </View>
         </View>
@@ -96,22 +96,22 @@ const EdgeOnboardingOfSweetScreen = () => {
 
       <TouchableOpacity
         onPress={() => {
-          if (thisNathIndexSlide >= sweetDataOfOnboarding.length - 1) {
+          if (idOfTheSweetSlide >= sweetDataOfOnboarding.length - 1) {
             navigation.replace('SweetHomeScreenP');
           } else {
-            setThisNathIndexSlide(thisNathIndexSlide + 1);
+            setIdOfTheSweetSlide(idOfTheSweetSlide + 1);
           }
         }}
         style={{
           alignItems: 'center',
           borderRadius: dimensions.width * 0.035,
-          height: dimensions.height * 0.069,
-          justifyContent: 'center',
-          bottom: dimensions.height * 0.05,
           alignSelf: 'center',
+          height: dimensions.height * 0.069,
+          position: 'absolute',
+          bottom: dimensions.height * 0.05,
+          justifyContent: 'center',
           backgroundColor: '#D99CBE',
           width: '85%',
-          position: 'absolute',
         }}
       >
         <Text

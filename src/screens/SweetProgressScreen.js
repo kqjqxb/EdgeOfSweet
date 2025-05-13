@@ -5,14 +5,12 @@ import {
     Dimensions,
     SafeAreaView,
     StyleSheet,
-    Switch,
-    TouchableOpacity
+    TouchableOpacity,
+    Share
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native-animatable';
 
 const fontMontserratRegular = 'Montserrat-Regular';
-const fontNunitoRegular = 'Nunito-Regular';
 
 const levels = [
     {
@@ -49,7 +47,7 @@ const getProgressForLevel = (level, levelPoints) => {
 
 const SweetProgressScreen = ({ levelPoints }) => {
     const dimensions = Dimensions.get('window');
-    const styles = mathSettingsStyles(dimensions);
+    const styles = sweetStyles(dimensions);
 
     return (
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
@@ -116,7 +114,7 @@ const SweetProgressScreen = ({ levelPoints }) => {
                                 position: 'relative',
                             }}>
                                 <View style={{
-                                    width: dimensions.width * 0.65 * progress, // заповнення залежить від обчисленого progress
+                                    width: dimensions.width * 0.65 * progress,
                                     height: dimensions.height * 0.019,
                                     backgroundColor: '#582D45',
                                     borderRadius: dimensions.width * 0.04,
@@ -138,7 +136,11 @@ const SweetProgressScreen = ({ levelPoints }) => {
                 alignSelf: 'center',
                 justifyContent: 'center',
             }} onPress={() => {
-
+                const fullLevels = levels.filter(level => levelPoints >= level.id * 10).length;
+                const message = fullLevels === 0
+                    ? "I'm on the 1st level"
+                    : `I've completed ${fullLevels} level${fullLevels === 1 ? '' : 's'}!`;
+                Share.share({ message });
             }}>
                 <Text style={[styles.montserratText, { fontSize: dimensions.width * 0.045, textAlign: 'center', alignSelf: 'center', fontWeight: '400' }]}>
                     Share my progress
@@ -148,7 +150,7 @@ const SweetProgressScreen = ({ levelPoints }) => {
     );
 };
 
-const mathSettingsStyles = (dimensions) => StyleSheet.create({
+const sweetStyles = (dimensions) => StyleSheet.create({
     header: {
         width: '90%',
         height: dimensions.height * 0.07,
