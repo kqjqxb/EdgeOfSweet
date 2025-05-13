@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,18 +6,18 @@ import {
     SafeAreaView,
     StyleSheet,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    Share
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native-animatable';
+import sweetTasksData from '../components/sweetTasksData';
 
 const fontMontserratRegular = 'Montserrat-Regular';
 
-const SweetSavedScreen = ({ }) => {
+const SweetSavedScreen = ({ sweetFavTasks, setSweetFavTasks }) => {
     const dimensions = Dimensions.get('window');
     const styles = mathSettingsStyles(dimensions);
-
-    const [sweetSavedElements, setSweetSavedElements] = useState([]);
 
     return (
         <SafeAreaView style={{ width: dimensions.width, height: dimensions.height }}>
@@ -26,7 +26,7 @@ const SweetSavedScreen = ({ }) => {
                     Saved:
                 </Text>
             </View>
-            {sweetSavedElements.length === 0 ? (
+            {sweetFavTasks.length === 0 ? (
                 <Text style={[styles.montserratText, {
                     fontSize: dimensions.width * 0.04, textAlign: 'center', alignSelf: 'center', fontWeight: '500',
                     marginTop: dimensions.height * 0.05,
@@ -43,7 +43,7 @@ const SweetSavedScreen = ({ }) => {
                         paddingBottom: dimensions.height * 0.14,
                     }}
                 >
-                    {sweetSavedElements.map((sweetSavedEl, index) => (
+                    {sweetTasksData.filter(task => sweetFavTasks.includes(task.id)).map((sweetSavedEl, index) => (
                         <View key={index} style={{
                             width: '90%',
                             alignSelf: 'center',
@@ -74,7 +74,7 @@ const SweetSavedScreen = ({ }) => {
                                     fontSize: dimensions.width * 0.04, textAlign: 'left', fontWeight: '400',
                                     color: '#B27396'
                                 }]}>
-                                    12.04.2025
+                                    10 minutes
                                 </Text>
                             </View>
 
@@ -83,7 +83,7 @@ const SweetSavedScreen = ({ }) => {
                                 marginTop: dimensions.height * 0.01,
                                 color: '#582D45'
                             }]}>
-                                Look through old photos and remember a good moment.
+                                {sweetSavedEl.sweetTask}
                             </Text>
 
                             <View style={{
@@ -101,7 +101,13 @@ const SweetSavedScreen = ({ }) => {
                                     borderRadius: dimensions.width * 0.03,
                                     borderWidth: dimensions.width * 0.003,
                                     borderColor: '#582D45',
-                                }}>
+                                }}
+                                    onPress={() => {
+                                        Share.share({
+                                            message: `I completed the task '${sweetSavedEl.sweetTask}'`,
+                                        });
+                                    }}
+                                >
                                     <Image
                                         source={require('../assets/icons/shareSweetIcon.png')}
                                         style={{
@@ -120,7 +126,27 @@ const SweetSavedScreen = ({ }) => {
                                     borderRadius: dimensions.width * 0.03,
                                     backgroundColor: '#582D45',
                                     marginLeft: dimensions.width * 0.025,
-                                }}>
+                                }}
+                                    onPress={async () => {
+                                        try {
+                                            const storedFav = await AsyncStorage.getItem('sweetFavTasks');
+                                            let favTasks = storedFav ? JSON.parse(storedFav) : [];
+                                            const taskId = sweetSavedEl.id; 
+                                            if (favTasks.includes(taskId)) {
+                                                favTasks = favTasks.filter(id => id !== taskId);
+                                                console.log(`Removed task ${taskId}`);
+                                            } else {
+                                                favTasks.unshift(taskId);
+                                                console.log(`Added task ${taskId}`);
+                                            }
+                                            await AsyncStorage.setItem('sweetFavTasks', JSON.stringify(favTasks));
+                                            setSweetFavTasks(favTasks);
+                                            console.log('Updated favTasks:', favTasks);
+                                        } catch (err) {
+                                            console.error('Error toggling favourite task:', err);
+                                        }
+                                    }}
+                                >
                                     <Image
                                         source={require('../assets/icons/fullSweetHeartIcon.png')}
                                         style={{
